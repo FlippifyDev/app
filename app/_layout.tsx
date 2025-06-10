@@ -7,7 +7,7 @@ import { View } from 'react-native';
 export default function RootLayout() {
     return (
         <ApplicationProvider {...eva} theme={eva.dark}>
-            <View style={{ flex: 1, paddingTop: 32, backgroundColor: Colors.background }}>
+            <View style={{ flex: 1, backgroundColor: Colors.background }}>
                 <Stack />
             </View>
         </ApplicationProvider>

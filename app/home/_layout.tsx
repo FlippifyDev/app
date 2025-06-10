@@ -6,8 +6,8 @@ import React from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import HomeScreen from '.';
 import CameraScannerScreen from './camera-scanner';
-import SettingsScreen from './settings';
 import CompareScreen from './compare-result';
+import SettingsScreen from './settings';
 
 const Tab = createBottomTabNavigator();
 
@@ -48,11 +48,18 @@ const CustomTabBar = (props: any) => {
     );
 };
 
+const ScreenLayout = ({ children }: { children: React.ReactNode }) => {
+    return <View style={styles.screen}>{children}</View>;
+};
+
 const HomeLayout = () => {
     return (
         <>
             <Stack.Screen options={{ headerShown: false }} />
-            <Tab.Navigator tabBar={() => <CustomTabBar />}>
+            <Tab.Navigator
+                tabBar={() => <CustomTabBar />}
+                screenLayout={ScreenLayout}
+            >
                 <Tab.Screen
                     name="index"
                     component={HomeScreen}
@@ -100,6 +107,10 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
+    }, screen: {
+        paddingTop: 16,
+        backgroundColor: Colors.background,
+        flex: 1,
     },
 });
 
