@@ -76,8 +76,8 @@ export default function CompareScreen() {
     return (
         <Layout style={styles.container}>
             {loading ? (
-                <View style={{ flex: 1, height: "100%", justifyContent: "center", alignItems: "center" }}>
-                    <ActivityIndicator size="large" />
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color={Colors.buttonBlue} />
                 </View>
             ) : (
                 <CompareResults loading={loading} listed={listedResults} sold={soldResults} />
@@ -94,5 +94,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         paddingTop: 32,
         paddingBottom: 0,
+    },
+    loadingContainer: {
+        flex: 1,
+        height: "100%",
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: Colors.background, // Ensure loading screen has light background
     }
 })

@@ -23,7 +23,7 @@ export default function HomeScreen() {
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <Layout style={styles.container}>
                     <View style={styles.content}>
-                        <Text style={{ color: Colors.textSecondary }}>Recents</Text>
+                        <Text style={styles.recentsText}>Recents</Text>
                         <View style={styles.recent}>
                             <Recents />
                         </View>
@@ -33,7 +33,7 @@ export default function HomeScreen() {
                         placeholder="Enter keyword, sku, query"
                         style={styles.input}
                         size="large"
-                        textStyle={{ fontSize: 20 }}
+                        textStyle={styles.inputText}
                         autoCorrect={false}
                         autoComplete="off"
                         spellCheck={false}
@@ -67,6 +67,9 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
         color: Colors.textSecondary
     },
+    recentsText: {
+        color: Colors.textSecondary,
+    },
     recent: {
         flex: 1,
         marginVertical: 6,
@@ -75,5 +78,10 @@ const styles = StyleSheet.create({
     },
     input: {
         backgroundColor: Colors.cardBackground,
+        borderWidth: 0,
     },
+    inputText: {
+        fontSize: 20,
+        color: Colors.text,
+    }
 })

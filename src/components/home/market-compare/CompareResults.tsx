@@ -62,7 +62,7 @@ const CompareResults = ({
                         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 80, backgroundColor: Colors.background }}>
                             {hasValidlisted && (
                                 <View style={{ backgroundColor: Colors.background }}>
-                                    <Text category="h3" style={{ marginVertical: 8, color: Colors.textSecondary }}>Listed</Text>
+                                    <Text category="h3" style={{ marginVertical: 8, color: Colors.textSubtitle }}>Currently Listed</Text>
                                     {["ebay"].includes(selectedPlatform) && (
                                         <CardGrid item={currentListed} />
                                     )}
@@ -70,7 +70,7 @@ const CompareResults = ({
                             )}
                             {hasValidSold && (
                                 <View style={{ backgroundColor: Colors.background }}>
-                                    <Text category="h3" style={{ marginVertical: 8, color: Colors.textSecondary }}>Sold</Text>
+                                    <Text category="h3" style={{ marginVertical: 8, color: Colors.textSubtitle }}>Previously Sold</Text>
                                     {["ebay"].includes(selectedPlatform) && (
                                         <CardGrid item={currentSold} />
                                     )}
@@ -94,10 +94,10 @@ const CompareResults = ({
                         }}
                     >
                         {allPlatforms.map((platform) => (
-                            <TouchableOpacity style={{ backgroundColor: Colors.cardBackground, padding: 12, borderRadius: 12 }} key={platform} onPress={() => setSelectedPlatform(platform)}>
+                            <TouchableOpacity style={{ backgroundColor: selectedPlatform === platform ? Colors.cardSelectedBackground : Colors.cardBackground, padding: 12, borderRadius: 12, borderWidth: 1 }} key={platform} onPress={() => setSelectedPlatform(platform)}>
                                 <Text
                                     style={{
-                                        color: 'white',
+                                        color: 'black',
                                         fontWeight: selectedPlatform === platform ? 'bold' : 'normal',
                                     }}
                                 >
@@ -105,36 +105,36 @@ const CompareResults = ({
                                 </Text>
                             </TouchableOpacity>
                         ))}
-                        <TouchableOpacity style={{ backgroundColor: Colors.cardBackground, padding: 12, borderRadius: 12 }} key={"stockx"} onPress={() => setSelectedPlatform("stockx")}>
+                        <TouchableOpacity style={{ backgroundColor: Colors.cardBackground, padding: 12, borderRadius: 12, borderWidth: 1, }} key={"stockx"} onPress={() => setSelectedPlatform("stockx")}>
                             <Text
                                 style={{
-                                    color: 'white',
+                                    color: 'black',
                                     fontWeight: selectedPlatform === "stockx" ? 'bold' : 'normal',
                                 }}
                             >
                                 StockX
                             </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={{ backgroundColor: Colors.cardBackground, padding: 12, borderRadius: 12 }} key={"laced"} onPress={() => setSelectedPlatform("laced")}>
-                                <Text
-                                    style={{
-                                        color: 'white',
-                                        fontWeight: selectedPlatform === "laced" ? 'bold' : 'normal',
-                                    }}
-                                >
-                                    Laced
-                                </Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={{ backgroundColor: Colors.cardBackground, padding: 12, borderRadius: 12 }} key={"alias"} onPress={() => setSelectedPlatform("alias")}>
-                                <Text
-                                    style={{
-                                        color: 'white',
-                                        fontWeight: selectedPlatform === "alias" ? 'bold' : 'normal',
-                                    }}
-                                >
-                                    Alias
-                                </Text>
-                            </TouchableOpacity>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{ backgroundColor: Colors.cardBackground, padding: 12, borderRadius: 12, borderWidth: 1, }} key={"laced"} onPress={() => setSelectedPlatform("laced")}>
+                            <Text
+                                style={{
+                                    color: 'black',
+                                    fontWeight: selectedPlatform === "laced" ? 'bold' : 'normal',
+                                }}
+                            >
+                                Laced
+                            </Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={{ backgroundColor: Colors.cardBackground, padding: 12, borderRadius: 12, borderWidth: 1, }} key={"alias"} onPress={() => setSelectedPlatform("alias")}>
+                            <Text
+                                style={{
+                                    color: 'black',
+                                    fontWeight: selectedPlatform === "alias" ? 'bold' : 'normal',
+                                }}
+                            >
+                                Alias
+                            </Text>
+                        </TouchableOpacity>
                     </View>
                 </>
             )}

@@ -4,7 +4,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '@/src/config/firebase';
 import { useRouter } from 'expo-router';
 import { StyleSheet } from 'react-native';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { Colors } from '@/src/theme/colors'; // Fixed import path
 
 export default function LogoutButton() {
     const router = useRouter();
@@ -25,9 +25,10 @@ export default function LogoutButton() {
     );
 }
 
-
 const styles = StyleSheet.create({
     button: {
-        backgroundColor: Colors.cardBackground,
+        backgroundColor: 'rgba(220, 53, 69, 0.7)', // Red background with low opacity
+        borderRadius: 10,
+        borderWidth: 0,
     },
 });

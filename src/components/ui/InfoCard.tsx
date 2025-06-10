@@ -24,6 +24,7 @@ const styles = StyleSheet.create({
         width: "48%",
         marginVertical: 8,
         borderRadius: 12,
+        borderWidth: 0,
         backgroundColor: Colors.cardBackground
     },
     title: {
@@ -31,12 +32,14 @@ const styles = StyleSheet.create({
         fontSize: 12,
         textTransform: 'uppercase',
         letterSpacing: 1,
+        color: Colors.houseBlue,
     },
     body: {
         marginBottom: 4,
         fontSize: 30,
         textTransform: 'uppercase',
         letterSpacing: 1,
+        color: Colors.text,
     },
 });
 
