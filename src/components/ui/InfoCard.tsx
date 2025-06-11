@@ -36,8 +36,7 @@ const styles = StyleSheet.create({
     },
     body: {
         marginBottom: 4,
-        fontSize: 30,
-        textTransform: 'uppercase',
+        fontSize: 28,
         letterSpacing: 1,
         color: Colors.text,
     },

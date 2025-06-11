@@ -26,7 +26,7 @@ const ConnectedAccountsList: React.FC<Props> = ({ user }) => {
 
     return (
         <Layout style={styles.container}>
-            <Text category="h6">Connected Accounts</Text>
+            <Text category="h6" style={{ color: Colors.text }}>Connected Accounts</Text>
             <FlatList
                 data={accounts}
                 keyExtractor={([provider]) => provider}

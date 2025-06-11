@@ -7,13 +7,14 @@ import { request } from "./req";
 import { differenceInDays, parse } from "date-fns";
 import { enGB } from "date-fns/locale";
 import cheerio from "react-native-cheerio";
+import { getDomainByCurrency } from "@/src/utils/map";
 
 
-export async function scrapeSold({ query }: { query: string }): Promise<{ item?: IMarketSoldItem, error?: any }> {
+export async function scrapeSold({ query, currency }: { query: string, currency: string }): Promise<{ item?: IMarketSoldItem, error?: any }> {
     const keyword = query.replace(/\//g, "");
     const encodedQuery = encodeURIComponent(keyword);
 
-    const url = `https://www.ebay.com/sch/i.html?_fsrp=1&rt=nc&_from=R40&_nkw=${encodedQuery}&_sacat=0&LH_Sold=1&LH_Complete=1`;
+    const url = `https://www.ebay${getDomainByCurrency(currency)}/sch/i.html?_fsrp=1&rt=nc&_from=R40&_nkw=${encodedQuery}&_sacat=0&LH_Sold=1&LH_Complete=1`;
 
     try {
         // Step 1: Retrieve HTML
@@ -96,10 +97,15 @@ export async function scrapeSold({ query }: { query: string }): Promise<{ item?:
             }
             const roundedPrice = Math.round(price * 100) / 100;
 
+            const imageDivElem = $(el).find("div.s-item__image-wrapper");
+            const imgElem = imageDivElem.find('img');
+            const imgSrc = imgElem.attr('src') || imgElem.attr('data-src');
+
             listings.push({
                 title,
                 price: roundedPrice,
                 date: sellDate,
+                image: imgSrc
             });
         });
 
@@ -146,11 +152,11 @@ export async function scrapeSold({ query }: { query: string }): Promise<{ item?:
 }
 
 
-export async function scrapeListed({ query }: { query: string }): Promise<{ item?: IMarketListedItem, error?: any }> {
+export async function scrapeListed({ query, currency }: { query: string, currency: string }): Promise<{ item?: IMarketListedItem, error?: any }> {
     const keyword = query.replace(/\//g, "");
     const encodedQuery = encodeURIComponent(keyword);
 
-    const url = `https://www.ebay.com/sch/i.html?_fsrp=1&rt=nc&_from=R40&_nkw=${encodedQuery}&_sacat=0`;
+    const url = `https://www.ebay${getDomainByCurrency(currency)}/sch/i.html?_fsrp=1&rt=nc&_from=R40&_nkw=${encodedQuery}&_sacat=0`;
 
     try {
         // Step 1: Retrieve HTML
@@ -164,6 +170,7 @@ export async function scrapeListed({ query }: { query: string }): Promise<{ item
 
         let productCount = 0;
         let freeDelieveryCount = 0;
+        let image: string = "";
         const listings: IMarketListing[] = [];
 
         $("li.s-item.s-item__pl-on-bottom").each((_: number, el: Element) => {
@@ -209,9 +216,19 @@ export async function scrapeListed({ query }: { query: string }): Promise<{ item
                 freeDelieveryCount++;
             }
 
+
+            const imageDivElem = $(el).find("div.s-item__image-wrapper");
+            const imgElem = imageDivElem.find('img');
+            const imgSrc = imgElem.attr('src') || imgElem.attr('data-src');
+
+            if (!image.includes("https")) {
+                image = imgSrc as string;
+            }
+            
             listings.push({
                 title,
                 price: roundedPrice,
+                image: imgSrc
             });
         });
 
@@ -247,6 +264,7 @@ export async function scrapeListed({ query }: { query: string }): Promise<{ item
             freeDelieveryAmount: freeDelieveryCount,
             amount: productCount,
             price: stats,
+            image
         };
 
         return { item: marketItem };

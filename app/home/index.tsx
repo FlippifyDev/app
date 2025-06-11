@@ -18,7 +18,7 @@ export default function HomeScreen() {
         <KeyboardAvoidingView
             style={{ flex: 1, backgroundColor: Colors.background }}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={80}
+            keyboardVerticalOffset={0}
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <Layout style={styles.container}>
@@ -30,6 +30,7 @@ export default function HomeScreen() {
                     </View>
 
                     <SearchInput
+                        value={query}
                         placeholder="Enter keyword, sku, query"
                         style={styles.input}
                         size="large"
@@ -43,6 +44,7 @@ export default function HomeScreen() {
 
                             if (query.trim()) {
                                 router.push({ pathname: `/home/compare-result`, params: { query: String(query.trim()) } });
+                                setQuery('');
                             }
                         }}
                     />
@@ -57,7 +59,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: Colors.background,
-        paddingHorizontal: 32,
+        paddingHorizontal: 16,
         paddingTop: 32,
         paddingBottom: 0,
         justifyContent: 'space-between',
@@ -65,7 +67,7 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         justifyContent: 'flex-start',
-        color: Colors.textSecondary
+        color: Colors.textSecondary,
     },
     recentsText: {
         color: Colors.textSecondary,
@@ -79,6 +81,8 @@ const styles = StyleSheet.create({
     input: {
         backgroundColor: Colors.cardBackground,
         borderWidth: 0,
+        marginBottom: 10,
+        marginHorizontal: 15
     },
     inputText: {
         fontSize: 20,

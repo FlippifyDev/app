@@ -3,11 +3,12 @@ import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Stack, usePathname, useRouter } from 'expo-router';
 import React from 'react';
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import HomeScreen from '.';
 import CameraScannerScreen from './camera-scanner';
 import CompareScreen from './compare-result';
 import SettingsScreen from './settings';
+import AddListing from './add-listing';
 
 const Tab = createBottomTabNavigator();
 
@@ -88,6 +89,13 @@ const HomeLayout = () => {
                         headerShown: false,
                     }}
                 />
+                <Tab.Screen
+                    name="add-listing"
+                    component={AddListing}
+                    options={{
+                        headerShown: false,
+                    }}
+                />
             </Tab.Navigator>
         </>
     );
@@ -97,11 +105,22 @@ const styles = StyleSheet.create({
     tabBar: {
         flexDirection: "row",
         justifyContent: "center",
-        paddingTop: 12,
+        paddingTop: 14,
         alignItems: "flex-start",
-        elevation: 5,
         height: 80,
-        backgroundColor: Colors.background
+        backgroundColor: Colors.background,
+        // Android: simple elevation (always casts downward)
+        elevation: 5,
+
+        // iOS: custom upward‐pointing shadow
+        ...Platform.select({
+            ios: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 1 },
+                shadowOpacity: 0.1,
+                shadowRadius: 3,
+            },
+        }),
     },
     tabButton: {
         flex: 1,

@@ -46,6 +46,12 @@
           "microphonePermission": "Allow Flippify to access your microphone",
           "recordAudioAndroid": true
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow Flippify to use your location."
+        }
       ]
     ],
     "experiments": {

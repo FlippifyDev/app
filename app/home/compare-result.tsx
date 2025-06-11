@@ -1,14 +1,16 @@
-// External Imports
+// Local Imports
 import CompareResults from "@/src/components/home/market-compare/CompareResults";
+import { useMarketStorage } from "@/src/hooks/useMarketStorage";
 import { useUser } from "@/src/hooks/useUser";
-import { IMarketListedItem, IMarketSoldItem } from "@/src/models/market-compare";
-import { fetchFunctions } from "@/src/services/market-compare/constants";
+import { IUser } from "@/src/models/user";
+import { IMarketItem, retrieveMarketItem } from "@/src/services/market-compare/retrieve";
 import { Colors } from "@/src/theme/colors";
+import { MARKET_ITEM_CACHE_PREFIX } from "@/src/utils/contants";
 import { Layout } from "@ui-kitten/components";
 
-// Local Imports
-import { useGlobalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+// External Imports
+import { useFocusEffect, useGlobalSearchParams } from "expo-router";
+import { useCallback, useState } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 export default function CompareScreen() {
@@ -16,71 +18,57 @@ export default function CompareScreen() {
 
     const user = useUser()
 
-    const [listedResults, setListedResults] = useState<Record<string, IMarketListedItem>>({});
-    const [soldResults, setSoldResults] = useState<Record<string, IMarketSoldItem>>({});
+    const [marketItem, setMarketItem] = useState<IMarketItem>();
     const [loading, setLoading] = useState(false);
 
+    const { getItem, setItem } = useMarketStorage<IMarketItem>();
+    const cacheKey = typeof query === "string" ? `${MARKET_ITEM_CACHE_PREFIX}${query.trim()}` : '';
 
-    useEffect(() => {
-        const accounts = user?.connectedAccounts ? Object.keys(user.connectedAccounts) : [];
+    useFocusEffect(
+        useCallback(() => {
+            const accounts = user?.connectedAccounts ? Object.keys(user.connectedAccounts) : [];
 
-        async function fetchForType(type: "Listed" | "Sold") {
-            if (typeof query === "object" || !query) return {};
-            const newResults: Record<string, any> = {};
-
-            for (const account of accounts) {
-                const fn = fetchFunctions[`${account}${type}`];
-                if (typeof fn !== "function") continue;
-
-                try {
-                    const result = await fn({ query });
-
-                    if (!result.item) continue;
-                    newResults[account] = result.item;
-                } catch (err) {
-                    console.error(`Error fetching ${type} data for ${account}:`, err);
+            async function handleRun() {
+                if (
+                    typeof query === 'object' ||
+                    !query?.trim() ||
+                    !accounts.length ||
+                    !cacheKey
+                ) {
+                    return;
                 }
+
+                const cached = await getItem(cacheKey);
+                if (cached) {
+                    setMarketItem(cached);
+                    setLoading(false);
+                    return;
+                }
+
+                setLoading(true);
+
+                const { item, error } = await retrieveMarketItem({ user: user as IUser, query });
+                if (error) throw error;
+                if (item) {
+                    setMarketItem(item);
+                    await setItem(cacheKey, item);
+                }
+
+                setLoading(false);
             }
 
-            return newResults;
-        }
-
-        async function handleRun() {
-            // Validate input
-            if (typeof query === "object" || !query) return;
-            if (!query.trim()) return;
-            if (!accounts.length) return;
-
-            setLoading(true);
-            try {
-                const listed = await fetchForType("Listed");
-                setListedResults(listed);
-            } catch (e) {
-                setListedResults({});
-                console.log("handleRun (listed)", e)
-            }
-
-            try {
-                const sold = await fetchForType("Sold");
-                setSoldResults(sold);
-            } catch (e) {
-                setSoldResults({});
-                console.log("handleRun (sold)", e)
-            }
-            setLoading(false);
-        }
-
-        handleRun()
-    }, [query, user?.connectedAccounts])
+            handleRun();
+        }, [query, user, cacheKey, getItem, setItem])
+    );
 
     return (
         <Layout style={styles.container}>
             {loading ? (
                 <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color={Colors.buttonBlue} />
+                    <ActivityIndicator size="small" />
                 </View>
             ) : (
-                <CompareResults loading={loading} listed={listedResults} sold={soldResults} />
+                <CompareResults loading={loading} marketItem={marketItem} />
             )}
         </Layout>
     );
@@ -100,6 +88,6 @@ const styles = StyleSheet.create({
         height: "100%",
         justifyContent: "center",
         alignItems: "center",
-        backgroundColor: Colors.background, // Ensure loading screen has light background
+        backgroundColor: Colors.background,
     }
 })

@@ -6,7 +6,8 @@ export interface IMarketSoldItem {
         week?: number | null;
         month?: number | null;
     }
-    price?: IMarketStats
+    price?: IMarketStats;
+    image?: string | null;
 }
 
 export interface IMarketListedItem {
@@ -15,7 +16,8 @@ export interface IMarketListedItem {
     link?: string | null;
     freeDelieveryAmount?: number | null;
     amount?: number | null;
-    price?: IMarketStats
+    price?: IMarketStats;
+    image?: string | null;
 }
 
 
@@ -23,6 +25,7 @@ export interface IMarketListing {
     title?: string | null;
     price?: number | null;
     date?: Date | null;
+    image?: string | null;
 }
 
 
@@ -31,5 +34,6 @@ export interface IMarketStats {
     mean?: number | null;
     min?: number | null;
     max?: number | null;
+    image?: string | null;
 }
   

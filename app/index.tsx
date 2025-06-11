@@ -29,7 +29,7 @@ const Index = () => {
             <>
                 <Stack.Screen options={{ headerShown: false }} />
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors.background }}>
-                    <ActivityIndicator size="large" />
+                    <ActivityIndicator size="small" />
                 </View>
             </>
         );

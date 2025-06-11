@@ -14,7 +14,7 @@ const Subscription: React.FC<Props> = ({ user }) => {
 
     return (
         <Layout style={styles.container}>
-            <Text category="h6">Subscription</Text>
+            <Text category="h6" style={{ color: Colors.text }}>Subscription</Text>
             <View style={styles.accountContainer}>
                 <Ionicons name="checkmark-circle" size={20} color={Colors.iconGreen} style={{ marginRight: 8 }} />
 

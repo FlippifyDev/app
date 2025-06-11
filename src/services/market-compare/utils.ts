@@ -63,7 +63,7 @@ export function normaliseTitle({ value }: { value: string }) {
     const titled = words
         .map((w) => {
             if (w.length === 0) return "";
-            return w[0].toUpperCase() + w.slice(1);
+            return w[0]?.toUpperCase() + w.slice(1);
         })
         .join(" ");
 

@@ -1,10 +1,11 @@
 // Local Imports
+import { auth, firestore } from "@/src/config/firebase";
 import { IUser } from "@/src/models/user";
-import { usersCol } from './constants';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { firestore } from "@/src/config/firebase";
-import { doc, getDoc } from "firebase/firestore";
 import { CACHE_PREFIX } from "@/src/utils/contants";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { doc, getDoc } from "firebase/firestore";
+import { usersCol } from './constants';
+import { HardcodedStoreType } from "./models";
 
 
 export async function retrieveUser({ uid }: { uid: string }): Promise<IUser | void> {
@@ -29,5 +30,53 @@ export async function retrieveUser({ uid }: { uid: string }): Promise<IUser | vo
         }
     } catch (error) {
         console.error('Error retrieving user from Firestore:', error);
+    }
+}
+
+
+export async function retrieveIdToken() {
+    try {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const idToken = await user?.getIdToken();
+        if (!idToken) return;
+
+        return idToken;
+    } catch (error) {
+        console.error(error)
+    }
+}
+
+
+export async function retrieveConnectedAccount({ uid, storeType }: { uid: string, storeType: HardcodedStoreType }) {
+    try {
+        // Step 1: Retrieve users connected accounts
+        const accounts = await retrieveConnectedAccounts({ uid });
+        if (!accounts) return;
+
+        return (accounts as Record<string, any>)[storeType];
+    } catch (error) {
+        console.error(`Error in retrieveConnectedAccount: ${error}`);
+        return { error: `${error}` };
+    }
+}
+
+export async function retrieveConnectedAccounts({ uid }: { uid: string }): Promise<any> {
+    try {
+        // Step 1: Retrieve document reference
+        const docRef = doc(firestore, usersCol, uid);
+
+        // Step 2: Grab the user document
+        const snapshot = await getDoc(docRef);
+        if (!snapshot.exists()) throw new Error(`User with UID "${uid}" not found.`);
+
+        // Step 3: Pull out the connectedAccounts object
+        const data = snapshot.data();
+
+        return data?.connectedAccounts;
+    } catch (error) {
+        console.error(`Error in retrieveConnectedAccounts: ${error}`);
+        return { error: `${error}` };
     }
 }

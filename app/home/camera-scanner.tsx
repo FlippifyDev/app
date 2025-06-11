@@ -1,10 +1,22 @@
-
 import { Colors } from "@/src/theme/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { BarcodeScanningResult, CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { useFocusEffect, useRouter } from "expo-router";
-import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ActivityIndicator, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+
+
+const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
+
+// Rectangle dimensions
+const RECT_WIDTH = SCREEN_W * 0.8;
+const RECT_HEIGHT = 200;
+
+// Compute its on-screen bounds
+const RECT_LEFT = (SCREEN_W - RECT_WIDTH) / 2;
+const RECT_TOP = (SCREEN_H - RECT_HEIGHT) / 2;
+const RECT_RIGHT = RECT_LEFT + RECT_WIDTH;
+const RECT_BOTTOM = RECT_TOP + RECT_HEIGHT;
 
 export default function CameraScannerScreen() {
     const router = useRouter();
@@ -12,6 +24,16 @@ export default function CameraScannerScreen() {
     const [facing, setFacing] = useState<CameraType>('back');
     const [permission, requestPermission] = useCameraPermissions();
     const [checkingPermission, setCheckingPermission] = useState(true);
+
+    useEffect(() => {
+        setScanned(false)
+    }, [])
+
+    useFocusEffect(
+        useCallback(() => {
+            setScanned(false);
+        }, [])
+    );
 
     useFocusEffect(
         useCallback(() => {
@@ -38,7 +60,6 @@ export default function CameraScannerScreen() {
         );
     }
 
-
     if (!permission?.granted) {
         return (
             <View style={styles.container}>
@@ -49,15 +70,31 @@ export default function CameraScannerScreen() {
         );
     }
 
-
     function toggleCameraFacing() {
         setFacing(current => (current === 'back' ? 'front' : 'back'));
     }
 
-    function handleBarcodeScanned({ type, data }: BarcodeScanningResult) {
+    async function handleBarcodeScanned(event: BarcodeScanningResult) {
+        const { bounds, data } = event;
+
+        if (bounds) {
+            const centerX = bounds.origin.x + bounds.size.width / 2;
+            const centerY = bounds.origin.y + bounds.size.height / 2;
+
+            // If barcode outside the rectangle, ignore it:
+            if (
+                centerX < RECT_LEFT ||
+                centerX > RECT_RIGHT ||
+                centerY < RECT_TOP ||
+                centerY > RECT_BOTTOM
+            ) {
+                return;
+            }
+        }
+
         if (!scanned) {
             setScanned(true);
-            alert(`Scanned ${type}: ${data}`);
+            router.push({ pathname: `/home/compare-result`, params: { query: String(data.trim()) } });
         }
     }
 
@@ -88,10 +125,7 @@ export default function CameraScannerScreen() {
 
                     <View style={styles.bottomOverlay} />
                 </View>
-
             </CameraView >
-
-
         </View>
     );
 }
@@ -169,7 +203,7 @@ const styles = StyleSheet.create({
 
     middleRow: {
         flexDirection: 'row',
-        height: 250, // Height of square
+        height: RECT_HEIGHT,
     },
 
     sideOverlay: {
@@ -178,8 +212,8 @@ const styles = StyleSheet.create({
     },
 
     cutout: {
-        width: 250,
-        height: 250,
+        width: RECT_WIDTH,
+        height: RECT_HEIGHT,
         borderWidth: 1,
         borderColor: 'white',
         backgroundColor: 'transparent',

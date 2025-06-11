@@ -10,7 +10,6 @@ import React, { useRef, useState } from "react";
 import {
     ActivityIndicator,
     Animated,
-    Dimensions,
     Keyboard,
     KeyboardAvoidingView,
     Linking,
@@ -20,41 +19,10 @@ import {
     TouchableWithoutFeedback,
     View,
 } from "react-native";
-import { Path, Svg } from "react-native-svg";
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('screen');
-
-const WaveSvg = ({ animatedValue, isDarker = false }: { animatedValue: Animated.Value, isDarker?: boolean }) => {
-    const translateY = animatedValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0, -120],
-    });
-
-    return (
-        <Animated.View
-            style={{
-                position: "absolute",
-                bottom: isDarker ? 5 : -100,
-                left: 0,
-                right: 0,
-                transform: [{ translateY }],
-            }}
-        >
-            <Svg
-                width={screenWidth}
-                height={screenHeight}
-                viewBox="0 0 1440 800"
-                preserveAspectRatio="none"
-            >
-                <Path
-                    d="M0,200 C240,150 480,250 720,200 C960,150 1200,250 1440,200 L1440,800 L0,800 Z"
-                    fill={isDarker ? "#f5f5f5" : "#ffffff"}
-                    fillOpacity="1"
-                />
-            </Svg>
-        </Animated.View>
-    );
-};
+import WaveSvg from "@/src/components/login/WaveSVG";
+import LoginSVG from '@/assets/images/login4.svg';
+import LoginPlantSVG from '@/assets/images/login8.svg';
 
 const LoginScreen = () => {
     const router = useRouter();
@@ -136,6 +104,19 @@ const LoginScreen = () => {
                 <WaveSvg animatedValue={animatedValue} isDarker={true} />
                 <WaveSvg animatedValue={animatedValue} isDarker={false} />
             </LinearGradient>
+
+            <LoginSVG 
+                width={220}
+                height={220}
+                style={styles.bottomLeftSvg}
+            />
+
+
+            <LoginPlantSVG
+                width={70}
+                height={70}
+                style={styles.bottomRightSvg}
+            />
 
             {/* Content area with SafeAreaView */}
             <KeyboardAvoidingView
@@ -313,6 +294,20 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderWidth: 0,
         borderColor: "transparent",
+    },
+    bottomLeftSvg: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        transform: [{ scaleX: 1 }],
+    },
+    bottomRightSvg: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        marginBottom: 25,
+        marginRight: 20,
+        transform: [{ scaleX: -1 }],
     },
 });
 
