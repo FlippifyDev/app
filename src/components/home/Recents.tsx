@@ -1,4 +1,9 @@
+import { useMarketStorage } from '@/src/hooks/useMarketStorage';
+import { IMarketItem } from '@/src/models/market-compare';
+import { MARKET_ITEM_CACHE_PREFIX } from '@/src/utils/contants';
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import CurrencyList from 'currency-list';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useRef, useState } from 'react';
 import {
@@ -11,14 +16,8 @@ import {
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SwipeListView } from 'react-native-swipe-list-view';
-
-import { useMarketStorage } from '@/src/hooks/useMarketStorage';
-import { IMarketItem } from '@/src/services/market-compare/retrieve';
-import { Ionicons } from '@expo/vector-icons';
-import CurrencyList from 'currency-list';
+import Card from '../ui/Card';
 import NoResultsFound from '../ui/NoResultsFound';
-
-const MARKET_ITEM_CACHE_PREFIX = '@marketItem:';
 
 export default function Recents() {
     const router = useRouter();
@@ -63,7 +62,7 @@ export default function Recents() {
 
     const onSwipeValueChange = useCallback(({ key, value }: { key: string, value: number }) => {
         const partialOpenThreshold = -75;
-        const fullDeleteThreshold = -250;
+        const fullDeleteThreshold = -230;
 
         if (value < fullDeleteThreshold) {
             handleDelete(key);
@@ -103,7 +102,6 @@ export default function Recents() {
 
                     return (
                         <TouchableOpacity
-                            style={styles.entry}
                             activeOpacity={1}
                             onPress={() =>
                                 router.push({
@@ -112,14 +110,16 @@ export default function Recents() {
                                 })
                             }
                         >
-                            {imgUri && <Image source={{ uri: imgUri }} style={styles.entryImage} />}
-                            <View style={styles.entryText}>
-                                <Text style={styles.queryText}>{item.query}</Text>
-                                <Text style={styles.subtitle}>
-                                    {currencySymbol}
-                                    {item.item.ebay?.listed?.price?.median?.toFixed(2) ?? '—'}
-                                </Text>
-                            </View>
+                            <Card style={styles.entry}>
+                                {imgUri && <Image source={{ uri: imgUri }} style={styles.entryImage} />}
+                                <View style={styles.entryText}>
+                                    <Text style={styles.queryText}>{item.query}</Text>
+                                    <Text style={styles.subtitle}>
+                                        {currencySymbol}
+                                        {item.item.ebay?.listed?.price?.median?.toFixed(2) ?? '—'}
+                                    </Text>
+                                </View>
+                            </Card>
                         </TouchableOpacity>
                     );
                 }}
@@ -144,37 +144,25 @@ const styles = StyleSheet.create({
     loadingContainer: { flex: 1, justifyContent: 'center', width: '100%' },
     list: { paddingVertical: 8, paddingHorizontal: 16 },
     entry: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        padding: 12,
-        marginVertical: 6,
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        overflow: 'visible',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
-        elevation: 2,
+        paddingHorizontal: 12,
+        paddingVertical: 24,
     },
     entryImage: {
         width: 48,
         height: 48,
-        borderRadius: 4,
+        borderRadius: 9999,
         marginRight: 12,
         backgroundColor: '#eee',
     },
     entryText: { flex: 1 },
     queryText: { fontSize: 16, fontWeight: '600', color: '#333' },
     subtitle: { marginTop: 4, fontSize: 14, color: '#666' },
-
-    // Hidden row (delete)
     rowBack: {
         alignItems: 'center',
         backgroundColor: '#ff3b30',
         flex: 1,
         marginVertical: 6,
-        borderRadius: 8,
+        borderRadius: 13,
         justifyContent: 'flex-end',
         paddingRight: 20,
     },

@@ -1,49 +1,39 @@
-import { IUser } from "@/src/models/user";
 import { Colors } from "@/src/theme/colors";
-import { extractUserSubscription } from "@/src/utils/extract";
 import { Ionicons } from "@expo/vector-icons";
-import { Layout, Text } from "@ui-kitten/components";
+import { Text } from "@ui-kitten/components";
 import { StyleSheet, View } from "react-native";
+import Card from "../ui/Card";
 
-interface Props {
-    user?: IUser
-}
-
-const Subscription: React.FC<Props> = ({ user }) => {
-    const subscription = extractUserSubscription(user?.subscriptions ?? []);
-
+const Subscription = () => {
     return (
-        <Layout style={styles.container}>
-            <Text category="h6" style={{ color: Colors.text }}>Subscription</Text>
+        <Card style={{ width: "48%" }} href="subscription">
             <View style={styles.accountContainer}>
-                <Ionicons name="checkmark-circle" size={20} color={Colors.iconGreen} style={{ marginRight: 8 }} />
-
-                <Text style={styles.accountText}>{subscription?.name ?? "No subscription"}</Text>
+                <Ionicons name="planet-outline" size={26} style={styles.icon} />
+                <Text style={styles.label}>Subscription</Text>
             </View>
-        </Layout>
+        </Card>
     );
 };
 
-
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: "transparent",
-        marginTop: 16
-    },
     accountContainer: {
-        marginTop: 8,
-        flexDirection: 'row',
+        flexDirection: "column",
         borderRadius: 16,
+        padding: 8,
+        alignItems: "flex-start",
+        justifyContent: "center",
+    },
+    label: {
+        color: Colors.text,
+        fontSize: 16,
+        marginTop: 8,
+        fontWeight: "bold"
+    },
+    icon: {
         padding: 16,
-        alignItems: "center",
-        justifyContent: "flex-start",
+        borderRadius: 9999,
         backgroundColor: Colors.cardBackground,
     },
-    accountText: {
-        fontWeight: '600',
-        color: Colors.text,
-    },
-})
-
+});
 
 export default Subscription;

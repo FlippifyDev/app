@@ -1,14 +1,14 @@
 import { Colors } from '@/src/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Stack, usePathname, useRouter } from 'expo-router';
+import { Stack, Tabs, usePathname, useRouter } from 'expo-router';
 import React from 'react';
 import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
 import HomeScreen from '.';
+import AddListing from './add-listing';
 import CameraScannerScreen from './camera-scanner';
 import CompareScreen from './compare-result';
-import SettingsScreen from './settings';
-import AddListing from './add-listing';
+import SettingsScreen from './settings/index';
 
 const Tab = createBottomTabNavigator();
 
@@ -18,7 +18,6 @@ const CustomTabBar = (props: any) => {
     const isActive = (route: string) => pathname === route;
 
     function handleTabClick(route: "/home" | "/home/settings" | "/home/camera-scanner") {
-        console.log(route)
         if (!isActive(route)) router.push(route);
     }
 
@@ -57,9 +56,10 @@ const HomeLayout = () => {
     return (
         <>
             <Stack.Screen options={{ headerShown: false }} />
-            <Tab.Navigator
+            <Tabs
                 tabBar={() => <CustomTabBar />}
                 screenLayout={ScreenLayout}
+                screenOptions={{ headerShown: false }}
             >
                 <Tab.Screen
                     name="index"
@@ -96,7 +96,7 @@ const HomeLayout = () => {
                         headerShown: false,
                     }}
                 />
-            </Tab.Navigator>
+            </Tabs>
         </>
     );
 };
@@ -126,7 +126,8 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-    }, screen: {
+    }, 
+    screen: {
         paddingTop: 16,
         backgroundColor: Colors.background,
         flex: 1,

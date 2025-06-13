@@ -5,6 +5,7 @@ export const Colors = {
     text: '#000000',
     textSubtitle: '#444444',
     textSecondary: '#666666',
+    textPlaceholder: '#bbb',
     icon: '#000000',
     houseBlue: '#1a73e8',
     buttonBlue: '#1a9eea',

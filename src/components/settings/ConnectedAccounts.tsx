@@ -1,62 +1,39 @@
-import { IUser } from "@/src/models/user";
 import { Colors } from "@/src/theme/colors";
-import { mapAccountToAccountName } from "@/src/utils/contants";
 import { Ionicons } from "@expo/vector-icons";
-import { Layout, Text } from "@ui-kitten/components";
-import { FlatList, StyleSheet, View } from "react-native";
+import { Text } from "@ui-kitten/components";
+import { StyleSheet, View } from "react-native";
+import Card from "../ui/Card";
 
-interface Props {
-    user?: IUser;
-}
 
-const ConnectedAccountsList: React.FC<Props> = ({ user }) => {
-    const accounts = user?.connectedAccounts ? Object.entries(user.connectedAccounts) : [];
-
-    if (accounts.length === 0) {
-        return null;
-    }
-
-    const renderItem = ([provider, account]: [string, any]) =>
-        account ? (
-            <View style={styles.accountContainer} key={provider}>
-                <Ionicons name="checkmark-circle" size={20} color={Colors.iconGreen} style={{ marginRight: 8 }} />
-                <Text style={styles.accountText}>Connected to {mapAccountToAccountName[provider]}</Text>
-            </View>
-        ) : null;
-
+const ConnectedAccountsList = () => {
     return (
-        <Layout style={styles.container}>
-            <Text category="h6" style={{ color: Colors.text }}>Connected Accounts</Text>
-            <FlatList
-                data={accounts}
-                keyExtractor={([provider]) => provider}
-                renderItem={({ item }) => renderItem(item)}
-                contentContainerStyle={styles.listContent}
-            />
-        </Layout>
+        <Card style={{ width: "48%" }} href="connected-accounts">
+            <View style={styles.accountContainer}>
+                <Ionicons name="grid-outline" size={26} style={styles.icon} />
+                <Text style={styles.label}>Accounts</Text>
+            </View>
+        </Card>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: "transparent",
-        marginTop: 16
-    },
-    listContent: {
-        paddingVertical: 8,
-        gap: 6, 
-    },
     accountContainer: {
-        flexDirection: 'row',
+        flexDirection: "column",
         borderRadius: 16,
-        padding: 16,
-        alignItems: "center",
-        justifyContent: "flex-start",
-        backgroundColor: Colors.cardBackground,
+        padding: 8,
+        alignItems: "flex-start",
+        justifyContent: "center",
     },
-    accountText: {
-        fontWeight: '600',
+    label: {
         color: Colors.text,
+        fontSize: 16,
+        marginTop: 8,
+        fontWeight: "bold"
+    },
+    icon: {
+        padding: 16,
+        borderRadius: 9999,
+        backgroundColor: Colors.cardBackground,
     },
 });
 

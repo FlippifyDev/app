@@ -1,5 +1,3 @@
-"use server";
-
 export async function refreshStockXToken({ refresh_token }: { refresh_token: string }): Promise<{ access_token: string, refresh_token: string, id_token: string, expires_in: number, error?: string, error_description?: string }> {
     const CLIENT_ID = process.env.NEXT_PUBLIC_STOCKX_CLIENT_ID;
     const CLIENT_SECRET = process.env.STOCKX_CLIENT_SECRET;

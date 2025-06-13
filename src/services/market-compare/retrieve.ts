@@ -1,5 +1,5 @@
 // Local Imports
-import { IMarketListedItem, IMarketSoldItem } from "@/src/models/market-compare";
+import { IMarketItem } from "@/src/models/market-compare";
 import { IListing } from "@/src/models/store-data";
 import { IUser } from "@/src/models/user";
 import { scrapeListed as ebayListed, scrapeSold as ebaySold } from "@/src/services/market-compare/ebay";
@@ -7,13 +7,6 @@ import { scrapeListed as stockXListed } from "@/src/services/market-compare/stoc
 
 // External Imports
 
-export interface IMarketItem {
-    ebay?: {
-        listed?: IMarketListedItem;
-        sold?: IMarketSoldItem;
-    }
-    listing?: IListing
-}
 export async function retrieveMarketItem({ user, query }: { user: IUser, query: string }): Promise<{ item?: IMarketItem, error?: any }> {
     const currency = user.preferences?.currency as string;
 
@@ -22,7 +15,7 @@ export async function retrieveMarketItem({ user, query }: { user: IUser, query: 
         currency,
         initialQuantity: 1,
         quantity: 1,
-        recordType: "manual"
+        recordType: "manual",
     }
     const marketItem: IMarketItem = { ebay: {} }
 
@@ -55,6 +48,8 @@ export async function retrieveMarketItem({ user, query }: { user: IUser, query: 
         if (marketItem.ebay !== undefined) {
             marketItem.ebay.listed = ebayItem;
             listing.price = ebayItem?.price?.mean;
+            listing.purchase = {};
+            listing.purchase.price = ebayItem?.price?.mean;
             if (ebayItem?.image) {
                 listing.image = [ebayItem?.image]
             }

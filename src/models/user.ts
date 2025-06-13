@@ -84,4 +84,4 @@ interface IPreferences {
     currency?: CurrencyType;
 }
 
-export type { IUser, ISubscription, IReferral, IPreferences, IStore, IConnectedAccounts };
+export type { IUser, ISubscription, IReferral, IPreferences, IStore, IConnectedAccounts, INumListings, INumOrders, IExpenses };

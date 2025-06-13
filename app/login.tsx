@@ -21,8 +21,6 @@ import {
 } from "react-native";
 
 import WaveSvg from "@/src/components/login/WaveSVG";
-import LoginSVG from '@/assets/images/login4.svg';
-import LoginPlantSVG from '@/assets/images/login8.svg';
 
 const LoginScreen = () => {
     const router = useRouter();
@@ -104,19 +102,6 @@ const LoginScreen = () => {
                 <WaveSvg animatedValue={animatedValue} isDarker={true} />
                 <WaveSvg animatedValue={animatedValue} isDarker={false} />
             </LinearGradient>
-
-            <LoginSVG 
-                width={220}
-                height={220}
-                style={styles.bottomLeftSvg}
-            />
-
-
-            <LoginPlantSVG
-                width={70}
-                height={70}
-                style={styles.bottomRightSvg}
-            />
 
             {/* Content area with SafeAreaView */}
             <KeyboardAvoidingView

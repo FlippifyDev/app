@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         justifyContent: 'space-between',
         gap: 12,
+        marginTop: 10
     },
     cardWrapper: {
         flexDirection: 'row',
@@ -95,6 +96,7 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         width: '100%',
         gap: 1,
+        paddingHorizontal: 2,
     },
 
 });

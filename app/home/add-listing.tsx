@@ -5,22 +5,22 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function AddListing() {
-    const { listing } = useGlobalSearchParams();
-    const [parsedListing, setParsedListing] = useState<any | null>(null);
-
+    const { marketItem, cacheKey } = useGlobalSearchParams();
+    const [parsedItem, setParsedListing] = useState<any | null>(null);
+    
 
     useEffect(() => {
-        if (typeof listing === 'string') {
+        if (typeof marketItem === 'string') {
             try {
-                const parsed = JSON.parse(listing);
+                const parsed = JSON.parse(marketItem);
                 setParsedListing(parsed);
             } catch (err) {
                 console.error('Invalid listing JSON:', err);
             }
         }
-    }, [listing]);
+    }, [marketItem]);
 
-    if (!parsedListing) {
+    if (!parsedItem || !cacheKey) {
         return (
             <View style={styles.centered}>
                 <Text style={styles.errorText}>Invalid or missing listing data.</Text>
@@ -30,7 +30,7 @@ export default function AddListing() {
 
     return (
         <View style={styles.container}>
-            <ListingEditor listing={parsedListing} />
+            <ListingEditor marketItem={parsedItem} cacheKey={JSON.parse(cacheKey as string)} />
         </View>
     );
 }

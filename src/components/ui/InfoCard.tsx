@@ -1,7 +1,8 @@
 import { Colors } from '@/src/theme/colors';
-import { Card, Text } from '@ui-kitten/components';
+import { Text } from '@ui-kitten/components';
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Card from './Card';
 
 interface InfoCardProps {
     title: string;
@@ -10,22 +11,21 @@ interface InfoCardProps {
 
 const InfoCard = ({ title, body }: InfoCardProps) => {
     return (
-        <Card style={styles.card}>
-            <Text category="h1" style={styles.body}>{body}</Text>
-            <Text category="label" appearance="hint" style={styles.title}>
-                {title}
-            </Text>
+        <Card style={{ width: "48%" }}>
+            <View style={styles.cardContainer}>
+                <Text category="h1" style={styles.body}>{body}</Text>
+                <Text category="label" appearance="hint" style={styles.title}>
+                    {title}
+                </Text>
+            </View>
         </Card>
     );
 };
 
 const styles = StyleSheet.create({
-    card: {
-        width: "48%",
-        marginVertical: 8,
-        borderRadius: 12,
-        borderWidth: 0,
-        backgroundColor: Colors.cardBackground
+    cardContainer: {
+        flexDirection: "column",
+        padding: 8,
     },
     title: {
         marginBottom: 4,

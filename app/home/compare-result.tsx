@@ -1,12 +1,13 @@
 // Local Imports
 import CompareResults from "@/src/components/home/market-compare/CompareResults";
+import { SubScreenLayout } from "@/src/components/ui/SubScreenLayout";
 import { useMarketStorage } from "@/src/hooks/useMarketStorage";
 import { useUser } from "@/src/hooks/useUser";
+import { IMarketItem } from "@/src/models/market-compare";
 import { IUser } from "@/src/models/user";
-import { IMarketItem, retrieveMarketItem } from "@/src/services/market-compare/retrieve";
+import { retrieveMarketItem } from "@/src/services/market-compare/retrieve";
 import { Colors } from "@/src/theme/colors";
 import { MARKET_ITEM_CACHE_PREFIX } from "@/src/utils/contants";
-import { Layout } from "@ui-kitten/components";
 
 // External Imports
 import { useFocusEffect, useGlobalSearchParams } from "expo-router";
@@ -62,15 +63,17 @@ export default function CompareScreen() {
     );
 
     return (
-        <Layout style={styles.container}>
-            {loading ? (
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="small" />
-                </View>
-            ) : (
-                <CompareResults loading={loading} marketItem={marketItem} />
-            )}
-        </Layout>
+        <SubScreenLayout>
+            <View style={styles.container}>
+                {loading ? (
+                    <View style={styles.loadingContainer}>
+                        <ActivityIndicator size="small" />
+                    </View>
+                ) : (
+                    <CompareResults loading={loading} marketItem={marketItem} cacheKey={cacheKey} />
+                )}
+            </View>
+        </SubScreenLayout>
     );
 }
 
@@ -78,10 +81,6 @@ export default function CompareScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.background,
-        paddingHorizontal: 10,
-        paddingTop: 32,
-        paddingBottom: 0,
     },
     loadingContainer: {
         flex: 1,

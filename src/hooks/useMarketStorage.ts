@@ -79,6 +79,28 @@ export function useMarketStorage<T>() {
         }
     }, []);
 
+    const updateItem = useCallback(async (key: string, data: T, updateTimestamp: boolean = false) => {
+        try {
+            const raw = await AsyncStorage.getItem(key);
+            if (raw == null) {
+                console.warn(`useStorage.updateItem: No entry found for key "${key}"`);
+                return;
+            }
+
+            const existingEntry: Entry<T> = JSON.parse(raw);
+            const updatedEntry: Entry<T> = {
+                data,
+                timestamp: updateTimestamp ? Date.now() : existingEntry.timestamp,
+            };
+
+            setStore(s => ({ ...s, [key]: updatedEntry }));
+            await AsyncStorage.setItem(key, JSON.stringify(updatedEntry));
+        } catch (err) {
+            console.error(`useStorage.updateItem failed for key "${key}"`, err);
+        }
+    }, []);
+
+
     const getAllItems = useCallback(async (): Promise<{ query: string; item: T; timestamp: number }[]> => {
         try {
             const keys = await AsyncStorage.getAllKeys();
@@ -113,6 +135,7 @@ export function useMarketStorage<T>() {
         getItem,
         setItem,
         removeItem,
+        updateItem,
         getAllItems,
         store,
     };

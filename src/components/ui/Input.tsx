@@ -34,6 +34,7 @@ const Input: React.FC<InputProps> = ({
                         isRight && { paddingRight: 40 },
                         style,
                     ]}
+                    placeholderTextColor={Colors.textPlaceholder}
                     {...rest}
                 />
                 {isRight && (
@@ -56,7 +57,7 @@ const styles = StyleSheet.create({
     label: {
         fontSize: 16,
         fontWeight: '600',
-        color: '#444',
+        color: Colors.textSecondary,
         marginTop: 12,
         marginBottom: 4,
     },

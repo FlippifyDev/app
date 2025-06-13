@@ -1,10 +1,11 @@
 // Local Imports
 import Recents from '@/src/components/home/Recents';
+import PageTitle from '@/src/components/ui/PageTitle';
 import SearchInput from '@/src/components/ui/SearchInput';
 import { Colors } from '@/src/theme/colors';
 
 // External Imports
-import { Layout, Text } from '@ui-kitten/components';
+import { Layout } from '@ui-kitten/components';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
@@ -23,7 +24,7 @@ export default function HomeScreen() {
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <Layout style={styles.container}>
                     <View style={styles.content}>
-                        <Text style={styles.recentsText}>Recents</Text>
+                        <PageTitle text="Recents" />
                         <View style={styles.recent}>
                             <Recents />
                         </View>
@@ -67,9 +68,6 @@ const styles = StyleSheet.create({
     content: {
         flex: 1,
         justifyContent: 'flex-start',
-        color: Colors.textSecondary,
-    },
-    recentsText: {
         color: Colors.textSecondary,
     },
     recent: {

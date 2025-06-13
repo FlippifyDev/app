@@ -1,23 +1,25 @@
-import { IMarketListedItem, IMarketSoldItem } from '@/src/models/market-compare';
-import { IMarketItem } from '@/src/services/market-compare/retrieve';
+import { IMarketItem, IMarketListedItem, IMarketSoldItem } from '@/src/models/market-compare';
 import { Colors } from '@/src/theme/colors';
 import { mapAccountToAccountName } from '@/src/utils/contants';
 import { Ionicons } from '@expo/vector-icons';
 import { Layout, Text } from '@ui-kitten/components';
-import { useRouter } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import { useFocusEffect, useRouter } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import NoResultsFound from '../../ui/NoResultsFound';
+import PageTitle from '../../ui/PageTitle';
 import CardGrid from './GridCard';
 
 interface Props {
     loading: boolean;
-    marketItem?: IMarketItem
+    marketItem?: IMarketItem;
+    cacheKey: string;
 
 }
 const CompareResults = ({
     loading,
-    marketItem
+    marketItem,
+    cacheKey
 }: Props) => {
     const router = useRouter()
     const [hasValidlisted, setHasValidListed] = useState(false);
@@ -27,35 +29,33 @@ const CompareResults = ({
     const [currentSold, setCurrentSold] = useState<IMarketSoldItem>(marketItem?.ebay?.sold ?? {});
     const [selectedPlatform, setSelectedPlatform] = useState<string>("ebay");
 
-    useEffect(() => {
-        if (selectedPlatform === "ebay") {
-            setCurrentListed(marketItem?.ebay?.listed ?? {});
-            setCurrentSold(marketItem?.ebay?.sold ?? {});
+    useFocusEffect(
+        useCallback(() => {
+            if (selectedPlatform === "ebay") {
+                setCurrentListed(marketItem?.ebay?.listed ?? {});
+                setCurrentSold(marketItem?.ebay?.sold ?? {});
 
-            setHasValidListed(!(!marketItem?.ebay?.listed));
-            setHasValidSold(!(!marketItem?.ebay?.sold));
-        } else {
-            setHasValidListed(false);
-            setHasValidSold(false);
-        }
-
-
-    }, [selectedPlatform, marketItem]);
+                setHasValidListed(!(!marketItem?.ebay?.listed));
+                setHasValidSold(!(!marketItem?.ebay?.sold));
+            } else {
+                setHasValidListed(false);
+                setHasValidSold(false);
+            }
+        }, [selectedPlatform, marketItem])
+    );
 
     const allPlatforms = Object.keys(marketItem ?? {}).filter(key => key !== "listing");
 
     async function handleAddListing() {
-        const listing = marketItem?.listing;
-        if (!listing) return;
-
         router.push({
             pathname: `/home/add-listing`,
             params: {
-                listing: JSON.stringify(listing),
+                marketItem: JSON.stringify(marketItem),
+                cacheKey: JSON.stringify(cacheKey)
             },
         });
     }
-    
+
 
     return (
         <Layout style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -73,7 +73,8 @@ const CompareResults = ({
                         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 80, backgroundColor: Colors.background }}>
                             {hasValidlisted && (
                                 <View style={{ backgroundColor: Colors.background }}>
-                                    <Text category="h5" style={{ marginVertical: 8, color: Colors.textSubtitle }}>Currently Listed</Text>
+                                    <PageTitle text="Currently Listed" />
+
                                     {["ebay"].includes(selectedPlatform) && (
                                         <CardGrid item={currentListed} />
                                     )}
@@ -81,7 +82,7 @@ const CompareResults = ({
                             )}
                             {hasValidSold && (
                                 <View style={{ backgroundColor: Colors.background }}>
-                                    <Text category="h5" style={{ marginVertical: 8, color: Colors.textSubtitle }}>Previously Sold</Text>
+                                    <PageTitle text="Currently Sold" />
                                     {["ebay"].includes(selectedPlatform) && (
                                         <CardGrid item={currentSold} />
                                     )}

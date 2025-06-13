@@ -1,3 +1,5 @@
+import { IListing } from "./store-data";
+
 export interface IMarketSoldItem {
     platform?: string | null;
     title?: string | null;
@@ -37,3 +39,12 @@ export interface IMarketStats {
     image?: string | null;
 }
   
+
+export interface IMarketItem {
+    ebay?: {
+        listed?: IMarketListedItem;
+        sold?: IMarketSoldItem;
+    }
+    listing?: IListing,
+    isListed?: boolean;
+}

@@ -1,8 +1,8 @@
 import { IUser } from '@/src/models/user';
 import { Colors } from '@/src/theme/colors';
-import { Avatar, Layout, Text } from '@ui-kitten/components';
+import { Avatar, Text } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 interface Props {
     user?: IUser
@@ -22,16 +22,16 @@ export default function Profile({ user }: Props) {
     }, [user])
 
     return (
-        <Layout style={styles.container}>
+        <View style={styles.container}>
+            <View style={styles.textContainer}>
+                <Text category="h4" style={styles.name}>{username}</Text>
+                <Text appearance="hint" category="s1" style={styles.email}>{email}</Text>
+            </View>
             <Avatar
                 style={styles.avatar}
                 source={{ uri: image }}
             />
-            <Layout style={styles.textContainer}>
-                <Text category="h4" style={styles.name}>{username}</Text>
-                <Text appearance="hint" category="s1" style={styles.email}>{email}</Text>
-            </Layout>
-        </Layout>
+        </View>
     );
 }
 
@@ -39,9 +39,8 @@ const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
         padding: 16,
-        backgroundColor: Colors.cardBackground,
         alignItems: 'center',
-        justifyContent: 'flex-start',
+        justifyContent: 'space-between',
         gap: 16,
         borderRadius: 16,
         width: '100%',
@@ -52,10 +51,9 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         flexShrink: 1,
-        backgroundColor: Colors.cardBackground,
     },
     name: {
-        marginBottom: 4,
+        marginBottom: 1,
         color: Colors.text,
     },
     email: {

@@ -30,12 +30,14 @@ export async function scrapeListed({ uid, query }: { uid?: string, query: string
 
         const res = await request_search({ accessToken, query });
         if (res.error) throw res.error;
+        if (!res.data) return { error: "No data returned from StockX" };
 
         const data = typeof res.data === "string" ? JSON.parse(res.data) : res.data;
         if (!data) return { error: null };
 
-        return { item: data.products[0] };
+        if (!data?.products?.length) return { error: "No products found in response" };
 
+        return { item: data.products[0] };
     } catch (error) {
         console.error(error);
         return { error: `${error}` }
