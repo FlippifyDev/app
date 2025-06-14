@@ -1,20 +1,18 @@
 import { uploadImage } from '@/src/services/imgur/upload';
 import { Colors } from '@/src/theme/colors';
 import { validateUrlInput } from '@/src/utils/input-validation';
-import { Ionicons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import React, { useEffect, useRef, useState } from 'react';
 import {
-    ActivityIndicator,
     Animated,
-    Modal,
     StyleSheet,
     Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+    View
 } from 'react-native';
+import FButton from './FButton';
+import FModal from './FModal';
+import Input from './Input';
 
 interface ImageUploadProps {
     fileName: string;
@@ -136,15 +134,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     }
 
     return (
-        <Modal visible={visible} transparent animationType="fade">
-            <View style={styles.overlay}>
-                <Animated.View style={[styles.modalContent, { transform: [{ translateY: slideAnim }] }]}>
-                    <TouchableOpacity onPress={handleCloseModal} style={styles.closeButton}>
-                        <Ionicons name="close" size={24} color="white" />
-                    </TouchableOpacity>
-
-                    {error && <Text style={styles.error}>{error}</Text>}
-                    {/**
+        <FModal visible={visible} onClose={handleCloseModal}>
+            {/**
                      * 
                      
                     <TouchableOpacity
@@ -161,89 +152,36 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                         <View style={styles.hr} />
                     </View>
                     */}
-                    <TextInput
-                        style={styles.urlInput}
-                        onChangeText={handleUrlInput}
-                        placeholder="Paste URL"
-                        value={localUrl}
-                        editable={!validImage}
-                        autoCapitalize='none'
-                        autoCorrect={false}
-                        spellCheck={false}
-                        placeholderTextColor={Colors.textPlaceholder}
-                    />
-                    <TouchableOpacity
-                        onPress={handleLocalUpload}
-                        disabled={!validImage && !validUrl}
-                        style={[styles.uploadPhotoButton, (!validImage && !validUrl) && styles.disabledButton]}
-                    >
-                        {loading ? (
-                            <ActivityIndicator size="small" color="#000" />
-                        ) : (
-                            <Ionicons name="image-outline" size={20} color="black" />
-                        )}
-                        <Text style={styles.uploadPhotoText}>Upload</Text>
-                    </TouchableOpacity>
-                </Animated.View>
+            <View style={styles.container}>
+                <Input
+                    label="URL"
+                    onChangeText={handleUrlInput}
+                    placeholder="URL"
+                    value={localUrl}
+                    editable={!validImage}
+                    autoCapitalize='none'
+                    autoCorrect={false}
+                    spellCheck={false}
+                />
+                <FButton
+                    title="Upload"
+                    onPress={handleLocalUpload}
+                    disabled={loading}
+                />
+                {error && <Text style={styles.error}>{error}</Text>}
             </View>
-        </Modal>
+        </FModal >
     );
 };
 
 const styles = StyleSheet.create({
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.4)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-    },
-    modalContent: {
-        backgroundColor: '#ffffff',
-        padding: 20,
-        borderRadius: 10,
-        width: 300,
-        alignItems: 'center',
-        shadowColor: '#000000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
-    },
-    closeButton: {
-        position: 'absolute',
-        top: -16,
-        right: -16,
-        backgroundColor: '#3c424b',
-        borderRadius: 9999,
-        padding: 8,
-        elevation: 4,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-    },
-    title: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
-        color: '#000000',
+    container: {
+        flexDirection: "column",
     },
     error: {
         color: '#ff0000',
-        marginBottom: 10,
-        fontSize: 14,
-    },
-    uploadButton: {
-        backgroundColor: '#808080',
-        padding: 10,
-        borderRadius: 5,
-        marginBottom: 10,
-        width: '50%',
-        alignItems: 'center',
-    },
-    uploadButtonText: {
-        color: '#ffffff',
+        marginTop: 10,
+        marginLeft: 3,
         fontSize: 14,
     },
     disabledButton: {
@@ -264,19 +202,6 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
         color: Colors.textSecondary,
         fontWeight: 'bold',
-        fontSize: 14,
-    },
-    urlInput: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        padding: 5,
-        height: 36,
-        width: '100%',
-        marginBottom: 10,
-        marginTop: 10,
-        backgroundColor: Colors.background,
-        borderRadius: 5,
-        textAlign: 'center',
         fontSize: 14,
     },
     uploadPhotoButton: {

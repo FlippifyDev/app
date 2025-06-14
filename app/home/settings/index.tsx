@@ -36,7 +36,6 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.background,
     },
     scrollContent: {
-        paddingTop: 32,
         paddingBottom: 16,
         paddingHorizontal: 20,
         height: "100%",

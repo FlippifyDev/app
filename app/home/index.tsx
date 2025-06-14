@@ -5,7 +5,6 @@ import SearchInput from '@/src/components/ui/SearchInput';
 import { Colors } from '@/src/theme/colors';
 
 // External Imports
-import { Layout } from '@ui-kitten/components';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
@@ -22,7 +21,7 @@ export default function HomeScreen() {
             keyboardVerticalOffset={0}
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-                <Layout style={styles.container}>
+                <View style={styles.container}>
                     <View style={styles.content}>
                         <PageTitle text="Recents" />
                         <View style={styles.recent}>
@@ -49,7 +48,7 @@ export default function HomeScreen() {
                             }
                         }}
                     />
-                </Layout>
+                </View>
             </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
     );
@@ -60,8 +59,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: Colors.background,
-        paddingHorizontal: 16,
-        paddingTop: 32,
+        paddingHorizontal: 1,
         paddingBottom: 0,
         justifyContent: 'space-between',
     },
@@ -83,7 +81,7 @@ const styles = StyleSheet.create({
         marginHorizontal: 15
     },
     inputText: {
-        fontSize: 20,
+        fontSize: 16,
         color: Colors.text,
     }
 })

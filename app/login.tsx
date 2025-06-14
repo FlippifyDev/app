@@ -1,7 +1,7 @@
 import { auth } from "@/src/config/firebase";
 import { Colors } from "@/src/theme/colors";
 import { Lato_900Black_Italic, useFonts } from "@expo-google-fonts/lato";
-import { Button, Input, Layout, Text } from "@ui-kitten/components";
+import { Button, Input, Text } from "@ui-kitten/components";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useRouter } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -111,7 +111,7 @@ const LoginScreen = () => {
             >
                 <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                     <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-                        <Layout style={styles.container}>
+                        <View style={styles.container}>
                             <Animated.View
                                 style={[
                                     styles.header,
@@ -192,7 +192,7 @@ const LoginScreen = () => {
                                     </Text>
                                 </View>
                             </Animated.View>
-                        </Layout>
+                        </View>
                     </ScrollView>
                 </TouchableWithoutFeedback>
             </KeyboardAvoidingView>

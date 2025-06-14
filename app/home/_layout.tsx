@@ -3,7 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Stack, Tabs, usePathname, useRouter } from 'expo-router';
 import React from 'react';
-import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Platform, SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import HomeScreen from '.';
 import AddListing from './add-listing';
 import CameraScannerScreen from './camera-scanner';
@@ -49,7 +49,7 @@ const CustomTabBar = (props: any) => {
 };
 
 const ScreenLayout = ({ children }: { children: React.ReactNode }) => {
-    return <View style={styles.screen}>{children}</View>;
+    return <SafeAreaView style={styles.screen}>{children}</SafeAreaView>;
 };
 
 const HomeLayout = () => {

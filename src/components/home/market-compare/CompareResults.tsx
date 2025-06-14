@@ -1,8 +1,7 @@
 import { IMarketItem, IMarketListedItem, IMarketSoldItem } from '@/src/models/market-compare';
 import { Colors } from '@/src/theme/colors';
-import { mapAccountToAccountName } from '@/src/utils/contants';
 import { Ionicons } from '@expo/vector-icons';
-import { Layout, Text } from '@ui-kitten/components';
+import { Layout } from '@ui-kitten/components';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
@@ -43,8 +42,6 @@ const CompareResults = ({
             }
         }, [selectedPlatform, marketItem])
     );
-
-    const allPlatforms = Object.keys(marketItem ?? {}).filter(key => key !== "listing");
 
     async function handleAddListing() {
         router.push({
@@ -93,44 +90,6 @@ const CompareResults = ({
 
                     {/* Bottom Tab Bar */}
                     <View style={styles.tabBar}>
-                        <View style={styles.tabButtonsWrapper}>
-                            {allPlatforms.map((platform) => (
-                                <TouchableOpacity
-                                    key={platform}
-                                    style={[
-                                        styles.tabButton,
-                                        selectedPlatform === platform && styles.tabButtonSelected,
-                                    ]}
-                                    onPress={() => setSelectedPlatform(platform)}
-                                >
-                                    <Text
-                                        style={[
-                                            styles.tabButtonText,
-                                            selectedPlatform === platform && styles.tabButtonTextSelected,
-                                        ]}
-                                    >
-                                        {mapAccountToAccountName[platform]}
-                                    </Text>
-                                </TouchableOpacity>
-                            ))}
-
-                            <TouchableOpacity
-                                style={[
-                                    styles.tabButton,
-                                    selectedPlatform === 'stockx' && styles.tabButtonSelected,
-                                ]}
-                                onPress={() => setSelectedPlatform('stockx')}
-                            >
-                                <Text
-                                    style={[
-                                        styles.tabButtonText,
-                                        selectedPlatform === 'stockx' && styles.tabButtonTextSelected,
-                                    ]}
-                                >
-                                    StockX
-                                </Text>
-                            </TouchableOpacity>
-                        </View>
 
                         <TouchableOpacity style={styles.addButton} onPress={handleAddListing}>
                             <Ionicons name="add-outline" size={26} color="white" />

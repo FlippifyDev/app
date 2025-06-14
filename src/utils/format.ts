@@ -19,3 +19,16 @@ export function formatDateToISO(date: Date, useCurrentTime?: boolean): string {
     }
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${milliseconds}`;
 }
+
+
+export const formatDate = (dateString: string | null | undefined) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        timeZone: "UTC",
+    };
+    return date.toLocaleDateString("en-GB", options);
+};

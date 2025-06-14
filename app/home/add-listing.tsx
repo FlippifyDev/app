@@ -1,4 +1,5 @@
 import ListingEditor from '@/src/components/home/add-listing/ListingEditor';
+import { SubScreenLayout } from '@/src/components/ui/SubScreenLayout';
 import { Colors } from '@/src/theme/colors';
 import { useGlobalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
@@ -7,7 +8,7 @@ import { StyleSheet, Text, View } from 'react-native';
 export default function AddListing() {
     const { marketItem, cacheKey } = useGlobalSearchParams();
     const [parsedItem, setParsedListing] = useState<any | null>(null);
-    
+
 
     useEffect(() => {
         if (typeof marketItem === 'string') {
@@ -29,16 +30,14 @@ export default function AddListing() {
     }
 
     return (
-        <View style={styles.container}>
+        <SubScreenLayout>
             <ListingEditor marketItem={parsedItem} cacheKey={JSON.parse(cacheKey as string)} />
-        </View>
+        </SubScreenLayout>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        padding: 8,
-        marginTop: 12,
         flex: 1
     },
     centered: {

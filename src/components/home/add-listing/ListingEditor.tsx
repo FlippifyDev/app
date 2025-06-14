@@ -8,11 +8,9 @@ import { retrieveIdToken } from '@/src/services/firebase/retrieve';
 import { updateItem } from '@/src/services/firebase/update';
 import { formatDateToISO } from '@/src/utils/format';
 import { generateRandomFlippifyListingId } from '@/src/utils/generate-random';
-import { Button } from '@ui-kitten/components';
 import CurrencyList from 'currency-list';
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
     Image,
     Keyboard,
     KeyboardAvoidingView,
@@ -25,10 +23,10 @@ import {
     View
 } from 'react-native';
 import DatePicker from '../../ui/DatePicker';
+import FButton from '../../ui/FButton';
 import ImageUpload from '../../ui/ImageUpload';
 import Input from '../../ui/Input';
 import SuccessModal from '../../ui/SuccessModal';
-import { Colors } from '@/src/theme/colors';
 
 interface Props {
     marketItem: IMarketItem;
@@ -163,7 +161,7 @@ const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
                         label="Listing Platform*"
                         value={localListing.storeType ?? ''}
                         onChangeText={(text) => updateField('storeType', text.toLowerCase().trim())}
-                        placeholder="eBay"
+                        placeholder="Listing Platform*"
                         autoCapitalize="none"
                         autoCorrect={false}
                     />
@@ -232,17 +230,16 @@ const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
                     <Input
                         label="Storage Location"
                         value={localListing.storageLocation ?? ''}
-                        onChangeText={(text) => updateField('storageLocation', text.trim())}
-                        placeholder="Shelf A"
+                        onChangeText={(text) => updateField('storageLocation', text)}
+                        placeholder="Storage Location"
                     />
 
-                    <Button
-                        style={styles.button}
+                    <FButton
+                        title={listing.itemId ? 'Edit' : 'Add'}
                         onPress={handleAddItem}
                         disabled={loading}
-                    >
-                        {loading ? <ActivityIndicator size="small" color="white" /> : listing.itemId ? 'Edit Listing' : 'Add Listing'}
-                    </Button>
+                        loading={loading}
+                    />
 
                     <SuccessModal
                         visible={showSuccessModal}
@@ -272,6 +269,8 @@ export default ListingEditor;
 const styles = StyleSheet.create({
     container: {
         padding: 16,
+        flexDirection: "column",
+        gap: 16,
     },
     image: {
         width: '100%',
@@ -294,8 +293,4 @@ const styles = StyleSheet.create({
         color: '#888',
         fontSize: 14,
     },
-    button: {
-        marginTop: 20,
-        backgroundColor: Colors.houseBlue
-    }
 });

@@ -1,5 +1,5 @@
 import { Colors } from "@/src/theme/colors";
-import { Ionicons } from "@expo/vector-icons"; 
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
@@ -7,9 +7,15 @@ import { ScrollView } from "react-native-gesture-handler";
 export const SubScreenLayout = ({ children }: { children: React.ReactNode }) => {
     const navigation = useNavigation();
 
+    const handleBackPress = () => {
+        if (navigation.canGoBack()) {
+            navigation.goBack();
+        }
+    };
+
     return (
         <ScrollView contentContainerStyle={styles.scrollContent} style={styles.container}>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
                 <Ionicons name="arrow-back" size={24} color="black" />
                 <Text style={styles.backText}>Back</Text>
             </TouchableOpacity>
@@ -24,7 +30,7 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.background,
     },
     scrollContent: {
-        paddingTop: 40,
+        paddingTop: 10,
         paddingHorizontal: 16,
         paddingBottom: 6,
         height: "100%",

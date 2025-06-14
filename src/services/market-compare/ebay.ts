@@ -81,6 +81,7 @@ export async function scrapeSold({ query, currency }: { query: string, currency:
 
             // 4d) Extract price
             const priceElem = $(el).find("span.s-item__price");
+            console.log(priceElem)
             if (!priceElem.length) {
                 return; // no price, skip
             }
@@ -109,6 +110,7 @@ export async function scrapeSold({ query, currency }: { query: string, currency:
             });
         });
 
+        console.log(listings)
         if (listings.length === 0) {
             return { error: "No results found (Listings 0)" };
         }
