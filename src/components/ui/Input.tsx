@@ -26,7 +26,7 @@ const Input: React.FC<InputProps> = ({
             {showLabel && (
                 <Text style={styles.floatingLabel}>{label}</Text>
             )}
-            {isLeft && (
+            {(isLeft && isFocused) && (
                 <View style={[styles.adornmentWrapper]}>
                     <Text style={styles.adornment}>{adornment}</Text>
                 </View>
@@ -34,8 +34,8 @@ const Input: React.FC<InputProps> = ({
             <TextInput
                 style={[
                     styles.input,
-                    isLeft && { paddingLeft: 22 },
-                    isRight && { paddingRight: 22 },
+                    (isLeft && isFocused) && { paddingLeft: 22 },
+                    (isRight && isFocused) && { paddingRight: 22 },
                     showLabel && { paddingTop: 26 },
                     isFocused && styles.focusedInput,
                     style,
@@ -45,7 +45,7 @@ const Input: React.FC<InputProps> = ({
                 onBlur={() => setIsFocused(false)}
                 {...rest}
             />
-            {isRight && (
+            {(isRight && isFocused) && (
                 <View style={[styles.adornmentWrapper]}>
                     <Text style={styles.adornment}>{adornment}</Text>
                 </View>

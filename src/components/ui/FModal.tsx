@@ -1,17 +1,19 @@
 import { Colors } from '@/src/theme/colors';
 import React, { useEffect, useRef } from 'react';
-import { Animated, Easing, Keyboard, Modal, ModalProps, PanResponder, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { Animated, Easing, Keyboard, Modal, ModalProps, PanResponder, StyleSheet, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 
 interface FModalProps extends ModalProps {
     visible: boolean;
     onClose: () => void;
     children: React.ReactNode;
+    containerStyle?: ViewStyle;
 }
 
 const FModal: React.FC<FModalProps> = ({
     visible,
     onClose,
     children,
+    containerStyle,
     style,
     ...rest
 }) => {
@@ -21,24 +23,19 @@ const FModal: React.FC<FModalProps> = ({
     const panResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
-            onPanResponderMove: (evt, gestureState) => {
-                const { dy } = gestureState;
-                // Apply resistance (scale down movement) when dragging up (dy < 0)
+            onPanResponderMove: (_evt, { dy }) => {
                 const adjustedDy = dy < 0 ? dy * 0.3 : dy;
                 slideAnim.setValue(adjustedDy);
             },
-            onPanResponderRelease: (evt, gestureState) => {
-                const { dy, vy } = gestureState;
+            onPanResponderRelease: (_evt, { dy, vy }) => {
                 if (dy > 100 || vy > 0.5) {
-                    // Close modal if dragged down significantly
                     Keyboard.dismiss();
                     Animated.timing(slideAnim, {
                         toValue: 300,
                         duration: 200,
                         useNativeDriver: true,
-                    }).start(() => onClose());
+                    }).start(onClose);
                 } else {
-                    // Snap back to bottom if dragged up or not far enough down
                     Animated.spring(slideAnim, {
                         toValue: 0,
                         useNativeDriver: true,
@@ -98,27 +95,29 @@ const FModal: React.FC<FModalProps> = ({
     };
 
     return (
-        <Modal visible={visible} transparent animationType="fade" style={[style]} {...rest}>
-            <TouchableWithoutFeedback onPress={handleOverlayPress}>
-                <View style={styles.overlay}>
-                    <Animated.View
-                        style={[
-                            styles.modalContent,
-                            {
-                                transform: [{ translateY: Animated.add(keyboardAnim, slideAnim) }],
-                            },
-                        ]}
-                        {...panResponder.panHandlers}
-                    >
-                        <View style={styles.modalHeader}>
-                            <View style={styles.dragHandle} />
-                        </View>
-                        <View style={styles.contentContainer}>
-                            {children}
-                        </View>
-                    </Animated.View>
-                </View>
-            </TouchableWithoutFeedback>
+        <Modal visible={visible} transparent animationType="fade" {...rest}>
+            <View style={[styles.container, containerStyle]}>
+                {/* Backdrop: only this area closes on tap */}
+                <TouchableWithoutFeedback onPress={handleOverlayPress}>
+                    <View style={styles.backdrop} />
+                </TouchableWithoutFeedback>
+
+                <Animated.View
+                    style={[
+                        styles.modalContent,
+                        {
+                            transform: [
+                                { translateY: Animated.add(keyboardAnim, slideAnim) },
+                            ],
+                        },
+                    ]}
+                >
+                    <View style={styles.modalHeader} {...panResponder.panHandlers}>
+                        <View style={styles.dragHandle} />
+                    </View>
+                    <View style={styles.contentContainer}>{children}</View>
+                </Animated.View>
+            </View>
         </Modal>
     );
 };
@@ -126,11 +125,18 @@ const FModal: React.FC<FModalProps> = ({
 export default FModal;
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'flex-end',
+    },
+    backdrop: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+      },
     overlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.4)',
         justifyContent: 'flex-end',
-        padding: 20,
     },
     modalContent: {
         backgroundColor: Colors.background,
@@ -140,13 +146,16 @@ const styles = StyleSheet.create({
         width: '100%',
         position: 'relative',
         alignItems: 'center',
+        maxHeight: "90%"
     },
     modalHeader: {
         width: '100%',
         flexDirection: 'row',
         justifyContent: 'center',
+        alignItems: "center",
         position: 'relative',
-        marginBottom: 10,
+        height: 20,
+        marginBottom: 10
     },
     dragHandle: {
         width: 45,

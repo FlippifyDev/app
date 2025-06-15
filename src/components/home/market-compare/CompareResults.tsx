@@ -1,10 +1,9 @@
 import { IMarketItem, IMarketListedItem, IMarketSoldItem } from '@/src/models/market-compare';
 import { Colors } from '@/src/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { Layout } from '@ui-kitten/components';
 import { useFocusEffect, useRouter } from 'expo-router';
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from 'react-native';
 import NoResultsFound from '../../ui/NoResultsFound';
 import PageTitle from '../../ui/PageTitle';
 import CardGrid from './GridCard';
@@ -55,7 +54,7 @@ const CompareResults = ({
 
 
     return (
-        <Layout style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View style={{ flex: 1, backgroundColor: Colors.background }}>
             {loading ? (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <ActivityIndicator size="small" />
@@ -67,7 +66,7 @@ const CompareResults = ({
                             <NoResultsFound />
                         </View>
                     ) : (
-                        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 80, backgroundColor: Colors.background }}>
+                        <View style={{ flex: 1 }}>
                             {hasValidlisted && (
                                 <View style={{ backgroundColor: Colors.background }}>
                                     <PageTitle text="Currently Listed" />
@@ -85,7 +84,7 @@ const CompareResults = ({
                                     )}
                                 </View>
                             )}
-                        </ScrollView>
+                        </View>
                     )}
 
                     {/* Bottom Tab Bar */}
@@ -97,7 +96,7 @@ const CompareResults = ({
                     </View>
                 </>
             )}
-        </Layout>
+        </View>
     );
 };
 

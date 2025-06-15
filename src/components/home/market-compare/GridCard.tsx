@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         width: '100%',
         gap: 1,
-        paddingHorizontal: 2,
+        paddingHorizontal: 5,
     },
 
 });

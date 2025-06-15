@@ -11,4 +11,5 @@ export const Colors = {
     houseHoverBlue: '#1A9EEA',
     buttonBlue: '#1a9eea',
     iconGreen: '#1a73e8',
+    successGreen: '#4BB543'
 };

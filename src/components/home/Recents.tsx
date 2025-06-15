@@ -85,6 +85,13 @@ export default function Recents() {
         return <NoResultsFound />;
     }
 
+    const handlePress = (query: string) => {
+        router.push({
+            pathname: '/home/compare-result',
+            params: { query },
+        })
+    };
+
     return (
         <GestureHandlerRootView style={styles.container}>
             <SwipeListView
@@ -100,27 +107,34 @@ export default function Recents() {
                     const currencySymbol =
                         CurrencyList.get(item.item.listing?.currency ?? 'USD')?.symbol_native || '';
 
+                    const listing = item.item.listing;
+
                     return (
-                        <TouchableOpacity
-                            activeOpacity={1}
-                            onPress={() =>
-                                router.push({
-                                    pathname: '/home/compare-result',
-                                    params: { query: item.query },
-                                })
-                            }
-                        >
-                            <Card style={styles.entry}>
-                                {imgUri && <Image source={{ uri: imgUri }} style={styles.entryImage} />}
-                                <View style={styles.entryText}>
-                                    <Text style={styles.queryText}>{item.query}</Text>
-                                    <Text style={styles.subtitle}>
-                                        {currencySymbol}
-                                        {item.item.ebay?.listed?.price?.median?.toFixed(2) ?? '—'}
-                                    </Text>
-                                </View>
-                            </Card>
-                        </TouchableOpacity>
+                        <Card style={styles.entry} onPress={() => handlePress(item.query)}>
+                            {imgUri && <Image source={{ uri: imgUri }} style={styles.entryImage} />}
+                            <View style={styles.entryText}>
+                                <Text style={styles.queryText}>{item.query}</Text>
+                                <Text style={styles.subtitle}>
+                                    {currencySymbol}
+                                    {item.item.ebay?.listed?.price?.median?.toFixed(2) ?? '—'}
+                                </Text>
+                            </View>
+                            <View
+                                style={[
+                                    styles.pill,
+                                    {
+                                        backgroundColor: listing?.itemId
+                                            ? 'rgba(40, 167, 69, 0.7)' // same green at 50% opacity
+                                            : 'rgba(0, 122, 255, 0.7)', // same blue at 50% opacity
+                                        borderColor: listing?.itemId
+                                            ? 'rgba(40, 167, 69, 0.7)'
+                                            : 'rgba(0, 122, 255, 0.7)',
+                                    },
+                                ]}
+                            >
+                                <Text style={{ color: "white", fontWeight: "bold" }}>{listing?.itemId ? "Listed" : "Unlisted"}</Text>
+                            </View>
+                        </Card>
                     );
                 }}
                 // Hidden behind view can be empty now
@@ -157,6 +171,14 @@ const styles = StyleSheet.create({
     entryText: { flex: 1 },
     queryText: { fontSize: 16, fontWeight: '600', color: '#333' },
     subtitle: { marginTop: 4, fontSize: 14, color: '#666' },
+    pill: {
+        position: "absolute",
+        right: 10,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 9999,
+        borderWidth: 1,
+    },
     rowBack: {
         alignItems: 'center',
         backgroundColor: '#ff3b30',

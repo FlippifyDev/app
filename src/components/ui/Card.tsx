@@ -5,10 +5,11 @@ import { useRouter } from 'expo-router';
 interface CardProps {
     style?: StyleProp<ViewStyle>;
     children: React.ReactNode;
+    onPress?: (value: any) => void;
     href?: "connected-accounts" | "subscription"; 
 }
 
-const Card = ({ style, children, href }: CardProps) => {
+const Card = ({ style, children, href, onPress }: CardProps) => {
     const router = useRouter();
 
     const handlePress = () => {
@@ -18,9 +19,9 @@ const Card = ({ style, children, href }: CardProps) => {
     };
 
     // Only make the card touchable if onPress or href is provided
-    if (href) {
+    if (onPress || href) {
         return (
-            <TouchableOpacity style={[styles.container, style]} onPress={handlePress} activeOpacity={0.7}>
+            <TouchableOpacity style={[styles.container, style]} onPress={onPress || handlePress} activeOpacity={1}>
                 {children}
             </TouchableOpacity>
         );

@@ -133,4 +133,4 @@ interface IOrders {
     depop?: Record<string, IOrder> | null;
 }
 
-export type { IListing, IOrder, IInventory, IOrders, IHistory, IShipping, IPurchase, ISale, ITaxes };
+export type { IHistory, IInventory, IListing, IOrder, IOrders, IPurchase, ISale, IShipping, ITaxes };

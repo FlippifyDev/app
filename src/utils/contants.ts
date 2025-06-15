@@ -9,6 +9,13 @@ export const mapAccountToAccountName: Record<string, string> = {
 
 export const MARKET_ITEM_CACHE_PREFIX = '@marketItem:';
 
+export const cacheExpirationTime = 1000 * 60 * 30; // 30 min in milliseconds
+export const inventoryCacheKey = "inventory"
+export const orderCacheKey = "orders"
+export const oneTimeExpensesCacheKey = "one-time-expenses"
+export const subscriptionsExpensesCacheKey = "subscriptions-expenses"
+export const statusCacheKey = "HsdaIDF89S"
+export const statusCacheExpirationTime = 1000 * 60 * 2 // 2 min in milliseconds
 
 // Free
 export const FREE_MAX_AUTOMATIC_LISTINGS = 12;

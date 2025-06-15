@@ -134,7 +134,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     }
 
     return (
-        <FModal visible={visible} onClose={handleCloseModal}>
+        <FModal visible={visible} onClose={handleCloseModal} containerStyle={{ paddingHorizontal: 10, paddingBottom: 20 }}>
             {/**
                      * 
                      

@@ -3,9 +3,10 @@ import { auth, firestore } from "@/src/config/firebase";
 import { IUser } from "@/src/models/user";
 import { CACHE_PREFIX } from "@/src/utils/contants";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, documentId, getDoc, getDocs, limit, orderBy, query, startAfter, where } from "firebase/firestore";
 import { usersCol } from './constants';
-import { HardcodedStoreType } from "./models";
+import { extractItemDateByFilter, extractItemId } from "./extract";
+import { DateFilterKeyType, HardcodedStoreType, ItemType, RootColType, SubColType } from "./models";
 
 
 export async function retrieveUser({ uid }: { uid: string }): Promise<IUser | void> {
@@ -78,5 +79,97 @@ export async function retrieveConnectedAccounts({ uid }: { uid: string }): Promi
     } catch (error) {
         console.error(`Error in retrieveConnectedAccounts: ${error}`);
         return { error: `${error}` };
+    }
+}
+
+
+export async function retrieveUserStoreTypes({
+    uid,
+    rootCol
+}: {
+    uid: string;
+    rootCol: string;
+}): Promise<string[]> {
+    try {
+        const metaRef = doc(firestore, rootCol, uid, '_meta', 'storeTypes');
+        const snap = await getDoc(metaRef);
+        if (!snap.exists()) return [];
+        const data = snap.data();
+        return Array.isArray(data.types) ? data.types : [];
+    } catch (error) {
+        console.error("Error retrieveUserStoreTypes:", error);
+        return [];
+    }
+  }
+
+interface RetrieveItemsFromDBProps {
+    uid: string;
+    rootCol: RootColType;
+    subCol: SubColType;
+    filterKey: DateFilterKeyType;
+    timeFrom: string;
+    timeTo?: string;
+    pagenate?: boolean;
+    pageLimit?: number;
+    lastDoc?: { id: string, date: string } | null;
+}
+export async function retrieveItemsFromDB({ uid, rootCol, subCol, filterKey, timeFrom, timeTo, pagenate, pageLimit = 48, lastDoc = null }: RetrieveItemsFromDBProps): Promise<{
+    items: Record<string, ItemType>;
+    lastVisible: { id: string, date: string } | null;
+}> {
+    const items: Record<string, ItemType> = {};
+
+    try {
+        // Step 1: Retrieve collection reference
+        const colRef = collection(firestore, rootCol, uid, subCol);
+
+        // Step 2: Build Query
+        let q = query(colRef, orderBy(filterKey, "desc"), orderBy(documentId(), "desc"));
+
+        // Step 3: Apply timeFrom filter if provided
+        if (timeFrom) {
+            q = query(q, where(filterKey, ">=", timeFrom));
+        }
+
+        // Step 4: Apply timeTo filter if provided
+        if (timeTo) {
+            q = query(q, where(filterKey, "<=", timeTo));
+        }
+
+        if (pagenate) {
+            // Step 5: If a last doc is passed in then apply this to the query
+            if (lastDoc) {
+                q = query(q, startAfter(lastDoc.date, lastDoc.id));
+            }
+
+            // Step 6: Apply query page limit
+            q = query(q, limit(pageLimit));
+        }
+
+        // Step 7: Query firestore with filters applied
+        const snapshot = await getDocs(q);
+        if (snapshot.empty) return { items: {}, lastVisible: null };
+
+        // Step 8: Map over documents and extract each item
+        snapshot.forEach((doc) => {
+            const item = doc.data() as ItemType;
+            const id = extractItemId({ item });
+
+            if (id) {
+                items[id] = item as ItemType
+            };
+        });
+
+        // Step 9: Retrieve the last visiable document snapshot
+        const itemKeys = Object.keys(items);
+        const lastKey = itemKeys[itemKeys.length - 1];
+        const lastVisibleItem = items[lastKey] ?? {};
+        const lastVisibleId = extractItemId({ item: lastVisibleItem }) as string
+        const lastVisibleDate = extractItemDateByFilter({ item: lastVisibleItem, filterKey }) as string;
+
+        return { items, lastVisible: { id: lastVisibleId, date: lastVisibleDate } };
+    } catch (error) {
+        console.error(`Error in retrieveItemsFromDB`, error);
+        throw new Error(`${error}`);
     }
 }

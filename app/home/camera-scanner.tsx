@@ -54,7 +54,7 @@ export default function CameraScannerScreen() {
     if (checkingPermission) {
         return (
             <View style={styles.container}>
-                <ActivityIndicator size="large" color="white" />
+                <ActivityIndicator size="small" />
                 <Text style={styles.message}>Requesting camera permission...</Text>
             </View>
         );

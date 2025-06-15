@@ -170,7 +170,7 @@ const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
                         label="Listing Price*"
                         value={localListing.price?.toString() ?? ''}
                         onChangeText={(text) => updateField('price', parseFloat(text) || 0)}
-                        placeholder="0.00"
+                        placeholder="Listing Price*"
                         keyboardType="numeric"
                         adornment={currencySymbol}
                         adornmentPosition="left"
@@ -187,7 +187,7 @@ const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
                                 },
                             }))
                         }
-                        placeholder="0.00"
+                        placeholder="Purchase Price"
                         keyboardType="numeric"
                         adornment={currencySymbol}
                         adornmentPosition="left"

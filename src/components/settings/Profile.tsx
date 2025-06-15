@@ -27,10 +27,16 @@ export default function Profile({ user }: Props) {
                 <Text category="h4" style={styles.name}>{username}</Text>
                 <Text appearance="hint" category="s1" style={styles.email}>{email}</Text>
             </View>
-            <Avatar
-                style={styles.avatar}
-                source={{ uri: image }}
-            />
+
+            {image && (
+                <Avatar
+                    style={styles.avatar}
+                    source={{ uri: image }}
+                />
+            )}
+            {!image && (
+                <View style={styles.avatar} />
+            )}
         </View>
     );
 }
@@ -48,6 +54,7 @@ const styles = StyleSheet.create({
     avatar: {
         width: 72,
         height: 72,
+        backgroundColor: Colors.cardBackground
     },
     textContainer: {
         flexShrink: 1,

@@ -11,6 +11,7 @@ export async function retrieveMarketItem({ user, query }: { user: IUser, query: 
     const currency = user.preferences?.currency as string;
 
     const listing: IListing = {
+        name: query,
         condition: "Brand New",
         currency,
         initialQuantity: 1,
