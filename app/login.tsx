@@ -3,7 +3,7 @@ import { Colors } from "@/src/theme/colors";
 import { Lato_900Black_Italic, useFonts } from "@expo-google-fonts/lato";
 import { Button, Input, Text } from "@ui-kitten/components";
 import { LinearGradient } from "expo-linear-gradient";
-import { Stack, useRouter } from "expo-router";
+import { useRouter } from "expo-router";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Eye, EyeOff } from "lucide-react-native";
 import React, { useRef, useState } from "react";
@@ -90,8 +90,6 @@ const LoginScreen = () => {
 
     return (
         <View style={styles.screenContainer}>
-            <Stack.Screen options={{ headerShown: false }} />
-
             {/* Background gradient - now outside SafeAreaView */}
             <LinearGradient
                 colors={["#2171ce", "#269de1"]}

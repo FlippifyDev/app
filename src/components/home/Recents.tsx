@@ -27,6 +27,14 @@ export default function Recents() {
 
     const openRows = useRef<Record<string, boolean>>({});
 
+    const handlePress = (query: string) => {
+        router.push({
+            pathname: '/home/recents/compare',
+            params: { query },
+        })
+    };
+
+
     // Reload on screen focus
     useFocusEffect(
         useCallback(() => {
@@ -85,13 +93,6 @@ export default function Recents() {
         return <NoResultsFound />;
     }
 
-    const handlePress = (query: string) => {
-        router.push({
-            pathname: '/home/compare-result',
-            params: { query },
-        })
-    };
-
     return (
         <GestureHandlerRootView style={styles.container}>
             <SwipeListView
@@ -112,6 +113,7 @@ export default function Recents() {
                     return (
                         <Card style={styles.entry} onPress={() => handlePress(item.query)}>
                             {imgUri && <Image source={{ uri: imgUri }} style={styles.entryImage} />}
+                            {!imgUri && <View style={styles.entryImage} />}
                             <View style={styles.entryText}>
                                 <Text style={styles.queryText}>{item.query}</Text>
                                 <Text style={styles.subtitle}>
@@ -124,15 +126,15 @@ export default function Recents() {
                                     styles.pill,
                                     {
                                         backgroundColor: listing?.itemId
-                                            ? 'rgba(40, 167, 69, 0.7)' // same green at 50% opacity
-                                            : 'rgba(0, 122, 255, 0.7)', // same blue at 50% opacity
+                                            ? 'rgba(40, 167, 69, 0.7)' 
+                                            : 'rgba(0, 122, 255, 0.7)', 
                                         borderColor: listing?.itemId
                                             ? 'rgba(40, 167, 69, 0.7)'
                                             : 'rgba(0, 122, 255, 0.7)',
                                     },
                                 ]}
                             >
-                                <Text style={{ color: "white", fontWeight: "bold" }}>{listing?.itemId ? "Listed" : "Unlisted"}</Text>
+                                <Text style={{ color: "white", fontWeight: "bold", fontSize: 12 }}>{listing?.itemId ? "Listed" : "Unlisted"}</Text>
                             </View>
                         </Card>
                     );
@@ -174,8 +176,8 @@ const styles = StyleSheet.create({
     pill: {
         position: "absolute",
         right: 10,
-        paddingHorizontal: 10,
-        paddingVertical: 5,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
         borderRadius: 9999,
         borderWidth: 1,
     },

@@ -5,16 +5,13 @@ import { Colors } from '@/src/theme/colors';
 import { extractUserListingsCount } from '@/src/utils/extract';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
+import NoResultsFound from '../../ui/NoResultsFound';
 import ListingItem from './ListingItem';
+import { TimeRange } from '../../ui/TimeFilter';
+import { formatDateToISO } from '@/src/utils/format';
 
 
-const ninetyDaysAgoISO = (() => {
-    const d = new Date();
-    d.setDate(d.getDate() - 90);
-    return d.toISOString();
-})();
-
-const Inventory = ({ searchText }: { searchText?: string }) => {
+const Inventory = ({ searchText, setRootItems, timeFilter }: { searchText?: string, timeFilter: TimeRange, setRootItems?: (value: IListing[]) => void }) => {
     const user = useUser();
     const [items, setItems] = useState<IListing[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -42,8 +39,9 @@ const Inventory = ({ searchText }: { searchText?: string }) => {
             setLoading(true);
             if (!user) return;
 
-            const items = await retrieveInventory({ uid: user.id as string, timeFrom: ninetyDaysAgoISO, searchText, searchFields: ["customTag", "itemId", "storeType", "name", "purchase.platform", "storageLocation", "sku"], pagenate: true, nextPage })
+            const items = await retrieveInventory({ uid: user.id as string, timeFrom: formatDateToISO(timeFilter.timeFrom), timeTo: formatDateToISO(timeFilter.timeTo), searchText, searchFields: ["customTag", "itemId", "storeType", "name", "purchase.platform", "storageLocation", "sku"], pagenate: true, nextPage })
             setItems(items ?? []);
+            setRootItems?.(items ?? [])
 
             setLoading(false);
 
@@ -52,7 +50,7 @@ const Inventory = ({ searchText }: { searchText?: string }) => {
         if ((user?.authentication?.subscribed && triggerUpdate) || nextPage) {
             fetchItems();
         }
-    }, [user, nextPage, searchText, triggerUpdate]);
+    }, [user, nextPage, searchText, triggerUpdate, setRootItems, timeFilter]);
 
     function handleEndReached() {
         if (currentPage >= totalPages) return;
@@ -72,19 +70,26 @@ const Inventory = ({ searchText }: { searchText?: string }) => {
 
     return (
         <View style={styles.container}>
-            <FlatList
-                data={paginatedData}
-                style={{ paddingHorizontal: 4 }}
-                keyExtractor={item => item.itemId as string}
-                renderItem={({ item }) => (
-                    <ListingItem item={item} />
-                )}
-                onEndReached={handleEndReached}
-                onEndReachedThreshold={0.5}
-                ListFooterComponent={() => loading ? <ActivityIndicator style={{ margin: 16 }} /> : null}
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={false}
-            />
+            {paginatedData.length > 0 && (
+                <FlatList
+                    data={paginatedData}
+                    style={{ paddingHorizontal: 4 }}
+                    keyExtractor={item => item.itemId as string}
+                    renderItem={({ item }) => (
+                        <ListingItem item={item} />
+                    )}
+                    onEndReached={handleEndReached}
+                    onEndReachedThreshold={0.5}
+                    ListFooterComponent={() => loading ? <ActivityIndicator style={{ margin: 16 }} /> : null}
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
+                />
+            )}
+            {paginatedData.length <= 0 && (
+                <View style={styles.noResultContainer}>
+                    <NoResultsFound />
+                </View>
+            )}
         </View>
     )
 }
@@ -97,6 +102,10 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 10,
         backgroundColor: Colors.background,
+    },
+    noResultContainer: {
+        flex: 1,
+        justifyContent: "center"
     },
     center: {
         flex: 1,

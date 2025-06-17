@@ -1,15 +1,16 @@
 import { auth } from '@/src/config/firebase';
 import { Colors } from '@/src/theme/colors';
+import { Ionicons } from '@expo/vector-icons';
+import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import { signOut } from 'firebase/auth';
-import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
-import Constants from 'expo-constants';
 import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Review from './Review';
 
 export default function LogoutButton() {
     const router = useRouter();
-    const appVersion = Constants.expoConfig?.version ?? 'Unknown'; 
+    const appVersion = Constants.expoConfig?.version ?? 'Unknown';
 
     const handleLogout = async () => {
         try {
@@ -22,7 +23,7 @@ export default function LogoutButton() {
 
     const openTerms = async () => {
         try {
-            await Linking.openURL('https://flippify.io/l/terms-and-conditions'); 
+            await Linking.openURL('https://flippify.io/l/terms-and-conditions');
         } catch (error) {
             console.error('Failed to open Terms and Conditions:', error);
         }
@@ -30,7 +31,7 @@ export default function LogoutButton() {
 
     const openPrivacy = async () => {
         try {
-            await Linking.openURL('https://flippify.io/l/privacy-policy'); 
+            await Linking.openURL('https://flippify.io/l/privacy-policy');
         } catch (error) {
             console.error('Failed to open Privacy Policy:', error);
         }
@@ -45,6 +46,7 @@ export default function LogoutButton() {
             <View style={styles.versionContainer}>
                 <Text style={styles.versionText}>Version {appVersion}</Text>
             </View>
+            <Review />
             <View style={styles.linksContainer}>
                 <TouchableOpacity onPress={openTerms}>
                     <Text style={styles.linkText}>Terms and Conditions</Text>
@@ -60,8 +62,8 @@ export default function LogoutButton() {
 
 const styles = StyleSheet.create({
     container: {
-        alignItems: 'center', 
-        marginTop: 16, 
+        alignItems: 'center',
+        marginTop: 16,
     },
     logoutContainer: {
         flexDirection: 'row',
@@ -95,12 +97,12 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         paddingHorizontal: 12,
         paddingTop: 6,
-        marginTop: 8, 
+        marginTop: 8,
     },
     versionText: {
         fontSize: 14,
         color: Colors.textSecondary,
-        fontWeight: '500', 
+        fontWeight: '500',
         textAlign: 'center',
     },
 });

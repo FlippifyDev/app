@@ -42,7 +42,7 @@ export default function SubscriptionScreen() {
                 </Card>
                 <Card style={{ width: "48%" }}>
                     <View style={styles.innerCardContainer}>
-                        <Text style={styles.value}>{(numOrders?.manual ?? 0) + (numOrders?.automatic ?? 0)}</Text>
+                        <Text style={styles.value}>{(numOrders?.totalManual ?? 0) + (numOrders?.totalAutomatic ?? 0)}</Text>
                         <Text style={styles.label}>Sales</Text>
                     </View>
                 </Card>
@@ -50,7 +50,7 @@ export default function SubscriptionScreen() {
             <View style={[styles.cardGrid]}>
                 <Card style={{ width: "48%" }}>
                     <View style={styles.innerCardContainer}>
-                        <Text style={styles.value}>{(numExpenses?.oneTime ?? 0)}</Text>
+                        <Text style={styles.value}>{(numExpenses?.totalOneTime ?? 0)}</Text>
                         <Text style={styles.label}>Expenses</Text>
                     </View>
                 </Card>

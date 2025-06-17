@@ -44,7 +44,7 @@ const CompareResults = ({
 
     async function handleAddListing() {
         router.push({
-            pathname: `/home/add-listing`,
+            pathname: `/home/recents/compare/add-listing`,
             params: {
                 marketItem: JSON.stringify(marketItem),
                 cacheKey: JSON.stringify(cacheKey)

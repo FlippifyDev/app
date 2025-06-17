@@ -1,5 +1,7 @@
 export const CACHE_PREFIX = 'user_cache_';
 
+export const APPSTORE_ID = "";
+export const GOOGLE_PLAY_PACKAGE_NAME = ""
 
 export const mapAccountToAccountName: Record<string, string> = {
     "ebay": "eBay",

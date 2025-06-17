@@ -18,7 +18,7 @@ export default function RecentsScreen() {
         <KeyboardAvoidingView
             style={{ flex: 1, backgroundColor: Colors.background }}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            keyboardVerticalOffset={0}
+            keyboardVerticalOffset={40}
         >
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <View style={styles.container}>
@@ -43,7 +43,7 @@ export default function RecentsScreen() {
                             Keyboard.dismiss();
 
                             if (query.trim()) {
-                                router.push({ pathname: `/home/compare-result`, params: { query: String(query.trim()) } });
+                                router.push({ pathname: `/home/recents/compare`, params: { query: String(query.trim()) } });
                                 setQuery('');
                             }
                         }}

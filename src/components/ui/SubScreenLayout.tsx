@@ -1,23 +1,20 @@
 import { Colors } from "@/src/theme/colors";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 export const SubScreenLayout = ({ children }: { children: React.ReactNode }) => {
-    const navigation = useNavigation();
+    const router = useRouter();
 
     const handleBackPress = () => {
-        if (navigation.canGoBack()) {
-            navigation.goBack();
-        }
+        router.back()
     };
 
     return (
         <ScrollView contentContainerStyle={styles.scrollContent} style={styles.container}>
             <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
                 <Ionicons name="arrow-back" size={24} color="black" />
-                <Text style={styles.backText}>Back</Text>
             </TouchableOpacity>
             {children}
         </ScrollView>

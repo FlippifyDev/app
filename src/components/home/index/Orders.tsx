@@ -3,18 +3,16 @@ import { IOrder } from '@/src/models/store-data';
 import { retrieveOrders } from '@/src/services/bridges/retrieve';
 import { Colors } from '@/src/theme/colors';
 import { extractUserListingsCount } from '@/src/utils/extract';
+import { formatDateToISO } from '@/src/utils/format';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
+import NoResultsFound from '../../ui/NoResultsFound';
+import { TimeRange } from '../../ui/TimeFilter';
 import OrderItem from './OrderItem';
 
 
-const ninetyDaysAgoISO = (() => {
-    const d = new Date();
-    d.setDate(d.getDate() - 90);
-    return d.toISOString();
-})();
 
-const Orders = ({ searchText }: { searchText?: string }) => {
+const Orders = ({ searchText, setRootItems, timeFilter }: { searchText?: string, timeFilter: TimeRange, setRootItems?: (value: IOrder[]) => void }) => {
     const user = useUser();
     const [items, setItems] = useState<IOrder[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -42,9 +40,10 @@ const Orders = ({ searchText }: { searchText?: string }) => {
             if (!user) return;
             setLoading(true);
 
-            const items = await retrieveOrders({ uid: user.id as string, timeFrom: ninetyDaysAgoISO, searchText, searchFields: ["customTag", "itemId", "storeType", "name", "purchase.platform", "storageLocation", "sku"], pagenate: true, nextPage })
+            const items = await retrieveOrders({ uid: user.id as string, timeFrom: formatDateToISO(timeFilter.timeFrom), timeTo: formatDateToISO(timeFilter.timeTo), searchText, searchFields: ["customTag", "itemId", "storeType", "name", "purchase.platform", "storageLocation", "sku"], pagenate: true, nextPage })
             const activeItems = (items ?? []).filter(item => item.status !== 'Active');
             setItems(activeItems);
+            setRootItems?.(activeItems);
 
             setLoading(false);
         }
@@ -52,7 +51,7 @@ const Orders = ({ searchText }: { searchText?: string }) => {
         if ((user?.authentication?.subscribed && triggerUpdate) || nextPage) {
             fetchItems();
         }
-    }, [user, nextPage, searchText, triggerUpdate]);
+    }, [user, nextPage, searchText, triggerUpdate, setRootItems, timeFilter]);
 
     function handleEndReached() {
         if (currentPage >= totalPages) return;
@@ -63,19 +62,26 @@ const Orders = ({ searchText }: { searchText?: string }) => {
 
     return (
         <View style={styles.container}>
-            <FlatList
-                data={paginatedData}
-                style={{ paddingHorizontal: 4 }}
-                keyExtractor={item => item.transactionId as string}
-                renderItem={({ item }) => (
-                    <OrderItem item={item} />
-                )}
-                showsVerticalScrollIndicator={false}
-                showsHorizontalScrollIndicator={false}
-                onEndReached={handleEndReached}
-                onEndReachedThreshold={0.5}
-                ListFooterComponent={() => loading ? <ActivityIndicator style={{ margin: 16 }} /> : null}
-            />
+            {paginatedData.length > 0 && (
+                <FlatList
+                    data={paginatedData}
+                    style={{ paddingHorizontal: 4 }}
+                    keyExtractor={item => item.transactionId as string}
+                    renderItem={({ item }) => (
+                        <OrderItem item={item} />
+                    )}
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
+                    onEndReached={handleEndReached}
+                    onEndReachedThreshold={0.5}
+                    ListFooterComponent={() => loading ? <ActivityIndicator style={{ margin: 16 }} /> : null}
+                />
+            )}
+            {paginatedData.length <= 0 && (
+                <View style={styles.noResultContainer}>
+                    <NoResultsFound />
+                </View>
+            )}
         </View>
     )
 }
@@ -88,6 +94,10 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 10,
         backgroundColor: Colors.background,
+    },
+    noResultContainer: {
+        flex: 1,
+        justifyContent: "center"
     },
     error: {
         color: 'red',

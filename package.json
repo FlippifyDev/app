@@ -22,6 +22,7 @@
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/material-top-tabs": "^7.2.15",
     "@react-navigation/native": "^7.1.11",
+    "@react-navigation/stack": "^7.3.4",
     "@ui-kitten/components": "^5.3.1",
     "@ui-kitten/eva-icons": "^5.3.1",
     "cheerio-without-node-native": "^1.0.0-rc.2",
@@ -55,6 +56,7 @@
     "react-dom": "19.0.0",
     "react-native": "0.79.2",
     "react-native-cheerio": "0.22.0",
+    "react-native-element-dropdown": "^2.12.4",
     "react-native-gesture-handler": "~2.24.0",
     "react-native-pager-view": "^6.8.1",
     "react-native-reanimated": "~3.17.4",
@@ -64,7 +66,8 @@
     "react-native-swipe-list-view": "^3.2.9",
     "react-native-tab-view": "^4.1.2",
     "react-native-web": "~0.20.0",
-    "react-native-webview": "13.13.5"
+    "react-native-webview": "13.13.5",
+    "expo-store-review": "~8.1.5"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

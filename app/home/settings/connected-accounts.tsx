@@ -4,7 +4,7 @@ import { useUser } from "@/src/hooks/useUser";
 import { Colors } from "@/src/theme/colors";
 import { mapAccountToAccountName } from "@/src/utils/contants";
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function ConnectedAccountsScreen() {
@@ -21,6 +21,7 @@ export default function ConnectedAccountsScreen() {
         setAccounts(connectedAccounts);
     }, [user]);
 
+
     return (
         <SubScreenLayout>
             <View style={styles.container}>
@@ -28,12 +29,23 @@ export default function ConnectedAccountsScreen() {
                     <PageTitle text="Accounts" />
                 </View>
 
-                {accounts.map(([provider, _]) => (
-                    <View style={styles.accountItem} key={provider}>
-                        <Ionicons name="checkmark-circle" size={20} color={Colors.iconGreen} style={{ marginRight: 8 }} />
-                        <Text style={styles.accountText}>Connected to {mapAccountToAccountName[provider]}</Text>
+                {accounts.length > 0 ? (
+                    <React.Fragment>
+                        {
+                            accounts.map(([provider, _]) => (
+                                <View style={styles.accountItem} key={provider}>
+                                    <Ionicons name="checkmark-circle" size={20} color={Colors.iconGreen} style={{ marginRight: 8 }} />
+                                    <Text style={styles.accountText}>Connected to {mapAccountToAccountName[provider]}</Text>
+                                </View>
+                            ))
+                        }
+                    </React.Fragment>
+                ) : (
+                    <View style={{ flex: 1 }}>
+                        <Text style={styles.connectAccountText}>No account connected</Text>
+                        <Text style={styles.connectAccountText}>Please login to our website to connect an account.</Text>
                     </View>
-                ))}
+                )}
             </View>
         </SubScreenLayout>
     );
@@ -64,6 +76,11 @@ const styles = StyleSheet.create({
     accountText: {
         fontWeight: '600',
         color: Colors.text,
+    },
+    connectAccountText: {
+        fontSize: 14,
+        color: Colors.textSecondary,
+        textAlign: "center"
     },
     empty: {
         marginTop: 20,

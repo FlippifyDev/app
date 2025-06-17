@@ -27,6 +27,7 @@ import FButton from '../../ui/FButton';
 import ImageUpload from '../../ui/ImageUpload';
 import Input from '../../ui/Input';
 import SuccessModal from '../../ui/SuccessModal';
+import { Colors } from '@/src/theme/colors';
 
 interface Props {
     marketItem: IMarketItem;
@@ -164,6 +165,8 @@ const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
                         placeholder="Listing Platform*"
                         autoCapitalize="none"
                         autoCorrect={false}
+                        readOnly={!(!localListing.storeType)}
+                        style={!(!localListing.storeType) ? { backgroundColor: Colors.muted } : undefined}
                     />
 
                     <Input

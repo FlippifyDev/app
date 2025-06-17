@@ -15,13 +15,15 @@ interface ItemProps {
 const OrderItem: React.FC<ItemProps> = ({ item, includeExtra }) => {
     const currencySymbol = CurrencyList.get(item.sale?.currency ?? 'USD')?.symbol_native || '';
     const salePrice = item.sale?.price ?? 0;
+    const purchasePrice = item.purchase?.price ?? 0;
+    const additionalFees = item.additionalFees ?? 0;
+    const shippingFees = item.shipping?.sellerFees ?? 0;
+    const profit = salePrice - purchasePrice - additionalFees - shippingFees;
 
     const [displayModal, setDisplayModal] = useState(false);
 
     const statusColor = (() => {
         switch (item.status) {
-            case 'Completed':
-                return Colors.successGreen;
             case 'Cancelled':
                 return 'red';
             default:
@@ -37,27 +39,30 @@ const OrderItem: React.FC<ItemProps> = ({ item, includeExtra }) => {
                 <View style={styles.entryText}>
                     <View style={styles.subText}>
                         <Text style={styles.nameText}>{shortenText(item.name as string, 20)}</Text>
-                        {includeExtra && (
+                        {(includeExtra && item.storageLocation) && (
                             <React.Fragment>
                                 <Text style={styles.subtitle}>{item.storageLocation ?? "N/A"}</Text>
                             </React.Fragment>
                         )}
+                        <Text style={styles.subtitle}>
+                            {`${currencySymbol}${item.sale?.price?.toFixed(2)}`}
+                        </Text>
                         <Text style={styles.subtitle}>
                             {formatDate(item.sale?.date) ?? "N/A"}
                         </Text>
                     </View>
 
                     <View style={styles.priceContainer}>
-                        {salePrice > 0 &&
+                        {profit > 0 &&
                             <Text style={styles.positivePrice}>
                                 +{currencySymbol}
-                                {salePrice >= 1000 ? salePrice.toFixed(0) : salePrice.toFixed(2)}
+                                {profit >= 1000 ? profit.toFixed(0) : profit.toFixed(2)}
                             </Text>
                         }
-                        {salePrice === 0 &&
+                        {profit === 0 &&
                             <Text style={styles.neutralPrice}>
                                 {currencySymbol}
-                                {salePrice.toFixed(2) ?? "N/A"}
+                                {profit.toFixed(2) ?? "N/A"}
                             </Text>
                         }
                     </View>
@@ -69,12 +74,15 @@ const OrderItem: React.FC<ItemProps> = ({ item, includeExtra }) => {
                 <FModal visible onClose={() => setDisplayModal(false)}>
                     <ScrollView style={styles.modalContent}>
                         <Text style={[styles.modalTitle, { color: statusColor }]}>{item.status === "InProcess" ? "Shipped" : item.status}</Text>
+                        {item.image?.[0] && <Image source={{ uri: item.image[0] }} style={styles.modalImage} />}
+                        <Text style={styles.modalTitle}>{item.name || 'Listing Details'}</Text>
 
                         <Section label="Order Info">
                             <Row label="Status" value={item.status === "InProcess" ? "Shipped" : item.status} />
                             <Row label="Item ID" value={item.itemId} />
                             <Row label="Order ID" value={item.orderId} />
                             <Row label="Transaction ID" value={item.transactionId} />
+                            <Row label="Profit" value={`${currencySymbol}${profit.toFixed(2)}`} />
                         </Section>
 
                         <Section label="Item Info">
@@ -161,7 +169,7 @@ const OrderItem: React.FC<ItemProps> = ({ item, includeExtra }) => {
                                 label="Tax Amount"
                                 value={
                                     item.tax?.amount != null
-                                        ? `${item.tax.currency ?? currencySymbol}${item.tax.amount.toFixed(2)}`
+                                        ? `${currencySymbol}${item.tax.amount.toFixed(2)}`
                                         : 'N/A'
                                 }
                             />
@@ -189,7 +197,7 @@ const OrderItem: React.FC<ItemProps> = ({ item, includeExtra }) => {
                                 label="Amount"
                                 value={
                                     item.refund?.amount != null
-                                        ? `${item.refund.currency ?? currencySymbol}${item.refund.amount.toFixed(2)}`
+                                        ? `${currencySymbol}${item.refund.amount.toFixed(2)}`
                                         : 'N/A'
                                 }
                             />
@@ -263,6 +271,7 @@ const styles = StyleSheet.create({
         flexDirection: "column",
         justifyContent: "space-between"
     },
+    modalImage: { height: 200, resizeMode: 'contain', marginBottom: 16, borderRadius: 16 },
     entryText: {
         flex: 1,
         flexDirection: "row",
@@ -276,7 +285,7 @@ const styles = StyleSheet.create({
     subtitle: { marginTop: 4, fontSize: 14, color: Colors.textSubtitle },
 
     modalContent: { color: Colors.text, marginBottom: 20 },
-    modalTitle: { fontSize: 20, fontWeight: '700', marginBottom: 12, width: "100%", textAlign: "center" },
+    modalTitle: { fontSize: 20, fontWeight: '700', marginBottom: 12, textAlign: "center", color: Colors.text },
 
     section: { marginTop: 16 },
     sectionLabel: {

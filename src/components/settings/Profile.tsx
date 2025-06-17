@@ -25,7 +25,7 @@ export default function Profile({ user }: Props) {
         <View style={styles.container}>
             <View style={styles.textContainer}>
                 <Text category="h4" style={styles.name}>{username}</Text>
-                <Text appearance="hint" category="s1" style={styles.email}>{email}</Text>
+                <Text appearance="hint" style={styles.email}>{email}</Text>
             </View>
 
             {image && (
@@ -65,6 +65,7 @@ const styles = StyleSheet.create({
     },
     email: {
         color: Colors.textSecondary,
+        fontSize: 14,
     },
     button: {
         width: 150,

@@ -94,7 +94,7 @@ export default function CameraScannerScreen() {
 
         if (!scanned) {
             setScanned(true);
-            router.push({ pathname: `/home/compare-result`, params: { query: String(data.trim()) } });
+            router.push({ pathname: `/home/recents/compare`, params: { query: String(data.trim()) } });
         }
     }
 

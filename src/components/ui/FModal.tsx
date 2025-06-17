@@ -14,50 +14,80 @@ const FModal: React.FC<FModalProps> = ({
     onClose,
     children,
     containerStyle,
-    style,
     ...rest
 }) => {
-    const slideAnim = useRef(new Animated.Value(500)).current;
+    // Animation values
+    const slideAnim = useRef(new Animated.Value(0)).current; // Initial position off-screen will be set dynamically
     const keyboardAnim = useRef(new Animated.Value(0)).current;
+    const backdropAnim = useRef(new Animated.Value(0)).current; // Backdrop opacity
+    const modalHeight = useRef(0); // To store the modal's height
 
+    // PanResponder for dragging
     const panResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
             onPanResponderMove: (_evt, { dy }) => {
-                const adjustedDy = dy < 0 ? dy * 0.3 : dy;
-                slideAnim.setValue(adjustedDy);
+                if (dy > 0) { // Only allow downward drag
+                    slideAnim.setValue(dy);
+                    // Update backdrop opacity: 1 (opaque) at dy=0, 0 (transparent) at dy=300
+                    const opacity = 1 - (dy / 300);
+                    backdropAnim.setValue(Math.max(opacity, 0));
+                }
             },
             onPanResponderRelease: (_evt, { dy, vy }) => {
-                if (dy > 100 || vy > 0.5) {
+                if (dy > 100 || vy > 0.5) { // Close if dragged far or fast enough
                     Keyboard.dismiss();
-                    Animated.timing(slideAnim, {
-                        toValue: 300,
-                        duration: 200,
-                        useNativeDriver: true,
-                    }).start(onClose);
-                } else {
-                    Animated.spring(slideAnim, {
-                        toValue: 0,
-                        useNativeDriver: true,
-                    }).start();
+                    Animated.parallel([
+                        Animated.timing(slideAnim, {
+                            toValue: modalHeight.current, // Slide to full height
+                            duration: 200,
+                            useNativeDriver: true,
+                        }),
+                        Animated.timing(backdropAnim, {
+                            toValue: 0, // Fully transparent
+                            duration: 200,
+                            useNativeDriver: true,
+                        }),
+                    ]).start(() => onClose());
+                } else { // Snap back to open position
+                    Animated.parallel([
+                        Animated.spring(slideAnim, {
+                            toValue: 0,
+                            useNativeDriver: true,
+                        }),
+                        Animated.spring(backdropAnim, {
+                            toValue: 1,
+                            useNativeDriver: true,
+                        }),
+                    ]).start();
                 }
             },
         })
     ).current;
 
+    // Handle modal visibility
     useEffect(() => {
         if (visible) {
-            Animated.timing(slideAnim, {
-                toValue: 0,
-                duration: 300,
-                useNativeDriver: true,
-            }).start();
+            Animated.parallel([
+                Animated.timing(slideAnim, {
+                    toValue: 0, // Slide up to visible position
+                    duration: 200,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(backdropAnim, {
+                    toValue: 1, // Backdrop fully opaque
+                    duration: 200,
+                    useNativeDriver: true,
+                }),
+            ]).start();
         } else {
-            slideAnim.setValue(500);
+            slideAnim.setValue(0); // Reset for next open
+            backdropAnim.setValue(0);
             Keyboard.dismiss();
         }
-    }, [visible, slideAnim]);
+    }, [visible, slideAnim, backdropAnim]);
 
+    // Handle keyboard
     useEffect(() => {
         const keyboardWillShowListener = Keyboard.addListener('keyboardWillShow', (e) => {
             const { duration, endCoordinates } = e;
@@ -95,13 +125,14 @@ const FModal: React.FC<FModalProps> = ({
     };
 
     return (
-        <Modal visible={visible} transparent animationType="fade" {...rest}>
+        <Modal visible={visible} transparent animationType="none" {...rest}>
             <View style={[styles.container, containerStyle]}>
-                {/* Backdrop: only this area closes on tap */}
+                {/* Backdrop with animated opacity */}
                 <TouchableWithoutFeedback onPress={handleOverlayPress}>
-                    <View style={styles.backdrop} />
+                    <Animated.View style={[styles.backdrop, { opacity: backdropAnim }]} />
                 </TouchableWithoutFeedback>
 
+                {/* Modal content */}
                 <Animated.View
                     style={[
                         styles.modalContent,
@@ -111,6 +142,9 @@ const FModal: React.FC<FModalProps> = ({
                             ],
                         },
                     ]}
+                    onLayout={(event) => {
+                        modalHeight.current = event.nativeEvent.layout.height;
+                    }}
                 >
                     <View style={styles.modalHeader} {...panResponder.panHandlers}>
                         <View style={styles.dragHandle} />
@@ -132,11 +166,6 @@ const styles = StyleSheet.create({
     backdrop: {
         ...StyleSheet.absoluteFillObject,
         backgroundColor: 'rgba(0,0,0,0.4)',
-      },
-    overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.4)',
-        justifyContent: 'flex-end',
     },
     modalContent: {
         backgroundColor: Colors.background,
@@ -146,16 +175,16 @@ const styles = StyleSheet.create({
         width: '100%',
         position: 'relative',
         alignItems: 'center',
-        maxHeight: "90%"
+        maxHeight: '90%',
     },
     modalHeader: {
         width: '100%',
         flexDirection: 'row',
         justifyContent: 'center',
-        alignItems: "center",
+        alignItems: 'center',
         position: 'relative',
         height: 20,
-        marginBottom: 10
+        marginBottom: 10,
     },
     dragHandle: {
         width: 45,

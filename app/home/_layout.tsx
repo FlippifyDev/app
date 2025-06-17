@@ -1,26 +1,24 @@
 import { Colors } from '@/src/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Tabs, usePathname, useRouter } from 'expo-router';
 import React from 'react';
 import { Platform, SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import HomeScreen from '.';
-import AddListing from './add-listing';
-import CameraScannerScreen from './camera-scanner';
-import CompareScreen from './compare-result';
-import RecentsScreen from './recents';
-import SettingsScreen from './settings/index';
-
-const Tab = createBottomTabNavigator();
 
 const CustomTabBar = (props: any) => {
     const pathname = usePathname();
     const router = useRouter();
-    const isActive = (route: string) => pathname.includes(route)
 
+    const isActive = (route: string) => {
+        if (route === '/home/index') {
+            // Match /home/index exactly or any sub-route (e.g., /home/index/Inventory)
+            return pathname === '/home' || pathname === '/home/index' || pathname.startsWith('/home/index/');
+        }
+        // For other routes, check if pathname starts with the route
+        return pathname.startsWith(route);
+    };
 
-    function handleTabClick(route: "/home/index" | "/home/settings" | "/home/camera-scanner" | "/home/recents") {
-        const validRoute = route.replace("/index", "") as "/home" | "/home/settings" | "/home/camera-scanner" | "/home/recents";
+    function handleTabClick(route: '/home/index' | '/home/settings' | '/home/camera-scanner' | '/home/recents') {
+        const validRoute = route.replace('/index', '') as '/home' | '/home/settings' | '/home/camera-scanner' | '/home/recents';
         if (!isActive(route)) router.push(validRoute);
     }
 
@@ -62,9 +60,10 @@ const CustomTabBar = (props: any) => {
     );
 };
 
-const ScreenLayout = ({ children }: { children: React.ReactNode }) => {
+function ScreenLayout({ children }: { children: React.ReactNode }) {
     return <SafeAreaView style={styles.screen}>{children}</SafeAreaView>;
 };
+
 
 const HomeLayout = () => {
     return (
@@ -73,44 +72,26 @@ const HomeLayout = () => {
             screenLayout={ScreenLayout}
             screenOptions={{ headerShown: false }}
         >
-            <Tab.Screen
+            <Tabs.Screen
                 name="index"
-                component={HomeScreen}
                 options={{
                     headerShown: false,
                 }}
             />
-            <Tab.Screen
+            <Tabs.Screen
                 name="recents"
-                component={RecentsScreen}
                 options={{
                     headerShown: false,
                 }}
             />
-            <Tab.Screen
+            <Tabs.Screen
                 name="camera-scanner"
-                component={CameraScannerScreen}
                 options={{
                     headerShown: false,
                 }}
             />
-            <Tab.Screen
+            <Tabs.Screen
                 name="settings"
-                component={SettingsScreen}
-                options={{
-                    headerShown: false,
-                }}
-            />
-            <Tab.Screen
-                name="compare-result"
-                component={CompareScreen}
-                options={{
-                    headerShown: false,
-                }}
-            />
-            <Tab.Screen
-                name="add-listing"
-                component={AddListing}
                 options={{
                     headerShown: false,
                 }}
