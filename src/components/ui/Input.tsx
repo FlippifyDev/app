@@ -32,6 +32,7 @@ const Input: React.FC<InputProps> = ({
                 </View>
             )}
             <TextInput
+                {...rest} // Note: Do not move this lower (will cause onFocus & onBlur to fail on some components);
                 style={[
                     styles.input,
                     (isLeft && isFocused) && { paddingLeft: 22 },
@@ -41,9 +42,15 @@ const Input: React.FC<InputProps> = ({
                     style,
                 ]}
                 placeholderTextColor={isFocused ? Colors.background : Colors.textSecondary}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
-                {...rest}
+                onFocus={(e) => {
+                    setIsFocused(true);
+                    rest.onFocus?.(e);
+                }}
+                onBlur={(e) => {
+                    setIsFocused(false);
+                    rest.onBlur?.(e);
+                }}
+                
             />
             {(isRight && isFocused) && (
                 <View style={[styles.adornmentWrapper]}>

@@ -2,6 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import FModal from './FModal';
+import { Colors } from '@/src/theme/colors';
 
 interface SuccessModalProps {
     visible: boolean;
@@ -26,7 +27,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
     };
 
     const statusIcon = isSuccess ? 'checkmark-circle' : 'close-circle';
-    const iconColor = isSuccess ? 'green' : 'red';
+    const iconColor = isSuccess ? Colors.houseBlue : 'red';
 
     return (
         <FModal visible={visible} onClose={onClose}>

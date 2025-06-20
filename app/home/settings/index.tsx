@@ -3,20 +3,20 @@ import ConnectedAccountsList from '@/src/components/settings/ConnectedAccounts';
 import LogoutButton from '@/src/components/settings/LogoutButton';
 import Profile from '@/src/components/settings/Profile';
 import Subscription from '@/src/components/settings/Subscription';
+import { SubScreenLayout } from '@/src/components/ui/SubScreenLayout';
 import { useUser } from '@/src/hooks/useUser';
 import { Colors } from '@/src/theme/colors';
 
 // External Imports
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
 
 
 export default function SettingsScreen() {
     const user = useUser();
 
     return (
-        <ScrollView contentContainerStyle={styles.scrollContent} style={styles.container}>
+        <SubScreenLayout>
             <Profile user={user} />
             <View style={styles.accountInfoContainer}>
                 <Subscription />
@@ -25,7 +25,7 @@ export default function SettingsScreen() {
             <View style={styles.logoutContainer}>
                 <LogoutButton />
             </View>
-        </ScrollView>
+        </SubScreenLayout>
     );
 }
 

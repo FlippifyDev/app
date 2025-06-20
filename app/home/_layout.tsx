@@ -1,3 +1,4 @@
+import { useUser } from '@/src/hooks/useUser';
 import { Colors } from '@/src/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs, usePathname, useRouter } from 'expo-router';
@@ -7,7 +8,9 @@ import { Platform, SafeAreaView, StyleSheet, TouchableOpacity, View } from 'reac
 const CustomTabBar = (props: any) => {
     const pathname = usePathname();
     const router = useRouter();
+    const user = useUser();
 
+    const hasNoAccess = !user?.authentication?.subscribed || user?.authentication?.subscribed === "free";
     const isActive = (route: string) => {
         if (route === '/home/index') {
             // Match /home/index exactly or any sub-route (e.g., /home/index/Inventory)
@@ -17,8 +20,8 @@ const CustomTabBar = (props: any) => {
         return pathname.startsWith(route);
     };
 
-    function handleTabClick(route: '/home/index' | '/home/settings' | '/home/camera-scanner' | '/home/recents') {
-        const validRoute = route.replace('/index', '') as '/home' | '/home/settings' | '/home/camera-scanner' | '/home/recents';
+    function handleTabClick(route: '/home/index' | '/home/store' | '/home/camera-scanner' | '/home/recents' | '/home/settings') {
+        const validRoute = route.replace('/index', '') as '/home' | '/home/store' | '/home/camera-scanner' | '/home/recents' | '/home/settings';
         if (!isActive(route)) router.push(validRoute);
     }
 
@@ -31,31 +34,39 @@ const CustomTabBar = (props: any) => {
                     color={Colors.icon}
                 />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.tabButton} onPress={() => handleTabClick('/home/recents')}>
-                <Ionicons
-                    name={isActive('/home/recents') ? 'search' : 'search-outline'}
-                    size={28}
-                    color={Colors.icon}
-                />
-            </TouchableOpacity>
-            <TouchableOpacity
-                style={styles.tabButton}
-                onPress={() => handleTabClick("/home/camera-scanner")}
-            >
-                <Ionicons
-                    name={isActive('/home/camera-scanner') ? 'camera' : 'camera-outline'}
-                    size={30}
-                    color={Colors.icon}
-                />
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.tabButton} onPress={() => handleTabClick('/home/settings')}>
-                <Ionicons
-                    name={isActive('/home/settings') ? 'settings-sharp' : 'settings-outline'}
-                    size={28}
-                    color={Colors.icon}
-                />
-            </TouchableOpacity>
+            {!hasNoAccess && (
+                <TouchableOpacity style={styles.tabButton} onPress={() => handleTabClick('/home/recents')}>
+                    <Ionicons
+                        name={isActive('/home/recents') ? 'search' : 'search-outline'}
+                        size={28}
+                        color={Colors.icon}
+                    />
+                </TouchableOpacity>
+            )}
+            {!hasNoAccess && (
+                <TouchableOpacity
+                    style={styles.tabButton}
+                    onPress={() => handleTabClick("/home/store")}
+                >
+                    <Ionicons
+                        name={isActive('/home/store') ? 'storefront' : 'storefront-outline'}
+                        size={26}
+                        color={Colors.icon}
+                    />
+                </TouchableOpacity>
+            )}
+            {hasNoAccess && (
+                <TouchableOpacity
+                    style={styles.tabButton}
+                    onPress={() => handleTabClick("/home/settings")}
+                >
+                    <Ionicons
+                        name={isActive('/home/store') ? 'settings' : 'settings-outline'}
+                        size={26}
+                        color={Colors.icon}
+                    />
+                </TouchableOpacity>
+            )}
         </View>
     );
 };

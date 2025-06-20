@@ -1,4 +1,4 @@
-import ListingEditor from '@/src/components/home/add-listing/ListingEditor';
+import ListingEditor from '@/src/components/home/add-listing/RecentsListingEditor';
 import { SubScreenLayout } from '@/src/components/ui/SubScreenLayout';
 import { Colors } from '@/src/theme/colors';
 import { useGlobalSearchParams } from 'expo-router';

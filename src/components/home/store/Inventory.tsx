@@ -1,25 +1,25 @@
 import { useUser } from '@/src/hooks/useUser';
-import { IOrder } from '@/src/models/store-data';
-import { retrieveOrders } from '@/src/services/bridges/retrieve';
+import { IListing } from '@/src/models/store-data';
+import { retrieveInventory } from '@/src/services/bridges/retrieve';
 import { Colors } from '@/src/theme/colors';
 import { extractUserListingsCount } from '@/src/utils/extract';
+import { formatDateToISO } from '@/src/utils/format';
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 import NoResultsFound from '../../ui/NoResultsFound';
-import OrderItem from './OrderItem';
 import { TimeRange } from '../../ui/TimeFilter';
-import { formatDateToISO } from '@/src/utils/format';
+import ListingItem from './ListingItem';
 
 
-const Active = ({ searchText, setRootItems, timeFilter }: { searchText?: string, timeFilter: TimeRange, setRootItems?: (value: IOrder[]) => void }) => {
+const Inventory = ({ searchText, setRootItems, timeFilter }: { searchText?: string, timeFilter: TimeRange, setRootItems?: (value: IListing[]) => void }) => {
     const user = useUser();
-    const [items, setItems] = useState<IOrder[]>([]);
+    const [items, setItems] = useState<IListing[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
     const [triggerUpdate, setTriggerUpdate] = useState(true);
 
     // Page Config
-    const itemsPerPage = 12;
+    const itemsPerPage = 24;
     const [currentPage, setCurrentPage] = useState(1);
     const totalListings = extractUserListingsCount(user);
     const totalPages = Math.ceil(totalListings / itemsPerPage);
@@ -36,22 +36,21 @@ const Active = ({ searchText, setRootItems, timeFilter }: { searchText?: string,
 
     useEffect(() => {
         async function fetchItems() {
-            if (!user) return;
             setLoading(true);
+            if (!user) return;
 
-            const items = await retrieveOrders({ uid: user.id as string, timeFrom: formatDateToISO(timeFilter.timeFrom), timeTo: formatDateToISO(timeFilter.timeTo), searchText, searchFields: ["customTag", "itemId", "storeType", "name", "purchase.platform", "storageLocation", "sku"], pagenate: true, nextPage })
-            const activeItems = (items ?? []).filter(item => item.status === 'Active');
-            setItems(activeItems);
-            setRootItems?.(activeItems);
+            const items = await retrieveInventory({ uid: user.id as string, timeFrom: formatDateToISO(timeFilter.timeFrom), timeTo: formatDateToISO(timeFilter.timeTo), searchText, searchFields: ["customTag", "itemId", "storeType", "name", "purchase.platform", "storageLocation", "sku"], pagenate: true, nextPage })
+            setItems(items ?? []);
+            setRootItems?.(items ?? [])
 
             setLoading(false);
+
         }
 
         if ((user?.authentication?.subscribed && triggerUpdate) || nextPage) {
             fetchItems();
         }
     }, [user, nextPage, searchText, triggerUpdate, setRootItems, timeFilter]);
-
 
     function handleEndReached() {
         if (currentPage >= totalPages) return;
@@ -60,21 +59,30 @@ const Active = ({ searchText, setRootItems, timeFilter }: { searchText?: string,
         setCurrentPage(currentPage + 1)
     }
 
+    if (loading) {
+        return (
+            <View style={styles.center}>
+                <ActivityIndicator size="small" />
+            </View>
+        );
+    }
+
+
     return (
         <View style={styles.container}>
             {paginatedData.length > 0 && (
                 <FlatList
                     data={paginatedData}
                     style={{ paddingHorizontal: 4 }}
-                    keyExtractor={item => item.transactionId as string}
+                    keyExtractor={item => item.itemId as string}
                     renderItem={({ item }) => (
-                        <OrderItem item={item} includeExtra />
+                        <ListingItem item={item} />
                     )}
-                    showsVerticalScrollIndicator={false}
-                    showsHorizontalScrollIndicator={false}
                     onEndReached={handleEndReached}
                     onEndReachedThreshold={0.5}
                     ListFooterComponent={() => loading ? <ActivityIndicator style={{ margin: 16 }} /> : null}
+                    showsVerticalScrollIndicator={false}
+                    showsHorizontalScrollIndicator={false}
                 />
             )}
             {paginatedData.length <= 0 && (
@@ -86,7 +94,7 @@ const Active = ({ searchText, setRootItems, timeFilter }: { searchText?: string,
     )
 }
 
-export default Active
+export default Inventory
 
 
 const styles = StyleSheet.create({
@@ -99,7 +107,31 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center"
     },
+    center: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: Colors.background,
+    },
     error: {
         color: 'red',
+    },
+    pagination: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 12,
+    },
+    pageBtn: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        backgroundColor: '#eee',
+        borderRadius: 4,
+    },
+    disabledBtn: {
+        opacity: 0.5,
+    },
+    pageInfo: {
+        fontSize: 14,
     },
 });

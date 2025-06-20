@@ -272,3 +272,46 @@ export async function getLastVisibleCacheData(
         return null;
     }
 }
+
+
+export async function retrieveCacheItem(cacheKey: string) {
+    try {
+        const raw = await AsyncStorage.getItem(cacheKey);
+        if (!raw) return null;
+        const parsed: { data: any, expiration: Date } = JSON.parse(raw);
+
+        // Compare current time with expiration
+        const currentTime = new Date();
+        const expirationTime = new Date(parsed.expiration);
+        if (currentTime > expirationTime) {
+            return null;
+        }
+
+        return parsed.data;
+    } catch (error) {
+        console.error("retrieveCacheItem", error);
+        return null;
+    }
+}
+
+
+export async function setCacheItem(cacheKey: string, data: any) {
+    try {
+        // Set expiration to 15 minutes from now
+        const expiration = new Date();
+        expiration.setMinutes(expiration.getMinutes() + 15);
+
+        // Create cache object with data and expiration
+        const cacheObject = {
+            data,
+            expiration: expiration,
+        };
+
+        // Serialize and store in AsyncStorage
+        await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheObject));
+        return true; // Indicate success
+    } catch (error) {
+        console.error("setCacheItem", error);
+        return null;
+    }
+}

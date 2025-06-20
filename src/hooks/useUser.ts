@@ -6,7 +6,7 @@ import { retrieveUser } from "../services/firebase/retrieve";
 // External Imports
 import { useEffect, useState } from "react";
 
-export function useUser(): IUser | undefined {
+export function useUser({ refresh }: { refresh?: boolean } = {}): IUser | undefined {
     const [user, setUser] = useState<IUser>();
 
     useEffect(() => {
@@ -15,7 +15,7 @@ export function useUser(): IUser | undefined {
         async function fetchUser() {
             const uid = auth.currentUser?.uid;
             if (!uid) return;
-            const fetchedUser = await retrieveUser({ uid });
+            const fetchedUser = await retrieveUser({ uid, refresh });
             if (mounted && fetchedUser) {
                 setUser(fetchedUser);
             }
@@ -26,7 +26,7 @@ export function useUser(): IUser | undefined {
         return () => {
             mounted = false;
         };
-    }, []);
+    }, [refresh]);
 
     return user;
 }

@@ -18,6 +18,8 @@ export default function ConnectedAccountsScreen() {
             ? Object.entries(user.connectedAccounts).filter(([_, value]) => value != null)
             : [];
 
+        console.log(connectedAccounts)
+
         setAccounts(connectedAccounts);
     }, [user]);
 
@@ -34,8 +36,12 @@ export default function ConnectedAccountsScreen() {
                         {
                             accounts.map(([provider, _]) => (
                                 <View style={styles.accountItem} key={provider}>
-                                    <Ionicons name="checkmark-circle" size={20} color={Colors.iconGreen} style={{ marginRight: 8 }} />
-                                    <Text style={styles.accountText}>Connected to {mapAccountToAccountName[provider]}</Text>
+                                    {provider && (
+                                        <React.Fragment>
+                                            <Ionicons name="checkmark-circle" size={20} color={Colors.iconGreen} style={{ marginRight: 8 }} />
+                                            <Text style={styles.accountText}>Connected to {mapAccountToAccountName[provider]}</Text>
+                                        </React.Fragment>
+                                    )}
                                 </View>
                             ))
                         }

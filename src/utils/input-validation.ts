@@ -19,3 +19,21 @@ export function validateUrlInput(
 
     }
 };
+
+
+export const validatePriceInput = (
+    value: string,
+    setFunction: (value: string) => void,
+    maxLength: number = 12
+): void => {
+    // Check if the input exceeds the maximum length.
+    if (value.length > maxLength) {
+        return;
+    }
+
+    // Regex to allow only numbers and at most one "."
+    const validPriceRegex = /^\d*(\.\d{0,2})?$/;
+    if (validPriceRegex.test(value)) {
+        setFunction(value);
+    }
+};

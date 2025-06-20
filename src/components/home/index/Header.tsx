@@ -1,111 +1,58 @@
 import { useUser } from '@/src/hooks/useUser';
-import { IListing, IOrder } from '@/src/models/store-data';
 import { Colors } from '@/src/theme/colors';
-import { Text } from '@ui-kitten/components';
-import CurrencyList from 'currency-list';
+import { Avatar } from '@ui-kitten/components';
+import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
-import Price from '../../ui/Price';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import FlippifyLogo from '../../ui/FlippifyLogo';
 
-const Header = ({ listingItems, activeItems, orderItems, currentTab }: { listingItems: IListing[], activeItems: IOrder[], orderItems: IOrder[], currentTab: string; }) => {
+const Header = () => {
     const user = useUser();
-    const [total, setTotal] = useState<number>(0);
-    const [currencySymbol, setCurrencySymbol] = useState<string>("$");
-    const [profit, setProfit] = useState<number>();
+    const router = useRouter();
+    const [image, setImage] = useState<string>();
 
     useEffect(() => {
-        setProfit(undefined);
-        let newTotal = 0;
-        let newProfit = 0;
-
-        switch (currentTab) {
-            case 'Inventory':
-                // Total value of inventory
-                newTotal = listingItems.reduce(
-                    (sum, item) => sum + (item.price || 0),
-                    0
-                );
-                // No profit when just viewing inventory
-                newProfit = 0;
-                break;
-
-            case 'Active':
-                // Sum of sale prices of active listings
-                newTotal = activeItems.reduce(
-                    (sum, item) => sum + (item.sale?.price || 0),
-                    0
-                );
-                // Potential profit = (sale price - purchase price) for each active order
-                newProfit = activeItems.reduce(
-                    (sum, item) =>
-                        sum +
-                        ((item.sale?.price || 0) - (item.purchase?.price || 0) - (item.tax?.amount || 0) - (item.additionalFees || 0) - (item.shipping?.sellerFees || 0)),
-                    0
-                );
-                break;
-
-            case 'Orders':
-                // Sum of sale prices of completed orders
-                newTotal = orderItems.reduce(
-                    (sum, item) => sum + (item.sale?.price || 0),
-                    0
-                );
-                // Realized profit = sale price minus cost for each order
-                newProfit = orderItems.reduce(
-                    (sum, item) =>
-                        sum +
-                        ((item.sale?.price || 0) - (item.purchase?.price || 0) - (item.tax?.amount || 0) - (item.additionalFees || 0) - (item.shipping?.sellerFees || 0)),
-                    0
-                );
-                break;
-
-            default:
-                newTotal = 0;
-                newProfit = 0;
-        }
-
-        setTotal(newTotal);
-        setProfit(newProfit);
-
-        // Set currency symbol from user preferences
         if (user) {
-            const currency = user.preferences?.currency ?? 'USD';
-            setCurrencySymbol(
-                CurrencyList.get(currency)?.symbol_native || currency
-            );
+            setImage(user.metaData?.image as string);
         }
-    }, [
-        listingItems,
-        activeItems,
-        orderItems,
-        currentTab,
-        user,
-    ]);
+    }, [user])
+
+    function handleOnAvatarClick() {
+        router.push("/home/settings");
+    }
+
 
     return (
-        <View style={styles.container}>
-            <Price price={total} currencySymbol={currencySymbol} baseSize={26} style={{ fontWeight: "bold" }} />
-            {(profit !== undefined && currentTab !== "Inventory") && (
-                <Text style={styles.summary}>
-                    <Price price={profit} currencySymbol={currencySymbol} baseSize={20} showSymbol style={{ color: Colors.houseBlue }} />
-                </Text>
+        <View style={styles.header}>
+            <FlippifyLogo style={{ fontSize: 28, paddingBottom: 1 }} />
+
+            {image && (
+                <TouchableOpacity onPress={handleOnAvatarClick}>
+                    <Avatar
+                        style={styles.avatar}
+                        source={{ uri: image }}
+                    />
+                </TouchableOpacity>
+            )}
+            {!image && (
+                <View style={styles.avatar} />
             )}
         </View>
-    );
-};
+    )
+}
+
 
 const styles = StyleSheet.create({
-    container: {
-        height: 50,
-        justifyContent: 'center',
-        alignItems: 'flex-end',
-        paddingRight: 25,
+    header: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: "100%",
     },
-    summary: {
-        fontSize: 16,
-        color: Colors.text,
-        marginBottom: 4,
+    avatar: {
+        width: 34,
+        height: 34,
+        backgroundColor: Colors.cardBackground
     },
-});
-
-export default Header;
+})
+export default Header

@@ -21,6 +21,7 @@ import {
 } from "react-native";
 
 import WaveSvg from "@/src/components/login/WaveSVG";
+import FlippifyLogo from "@/src/components/ui/FlippifyLogo";
 
 const LoginScreen = () => {
     const router = useRouter();
@@ -44,10 +45,9 @@ const LoginScreen = () => {
         try {
 
             await signInWithEmailAndPassword(auth, email, password);
-            router.replace("./home");
-        } catch (err: any) {
-            console.error("Login error:", err.message);
-            setError(err.message);
+            router.push({ pathname: "./home", params: { login: JSON.stringify(true) } });
+        } catch {
+            setError("Invalid email or password");
         }
         setLoading(false);
     };
@@ -71,13 +71,13 @@ const LoginScreen = () => {
     const renderEyeIcon = () =>
         passwordVisible ? (
             <Eye
-                color="#666666"
+                color={Colors.textPlaceholder}
                 size={24}
                 onPress={() => setPasswordVisible(false)}
             />
         ) : (
             <EyeOff
-                color="#666666"
+                    color={Colors.textPlaceholder}
                 size={24}
                 onPress={() => setPasswordVisible(true)}
             />
@@ -118,9 +118,7 @@ const LoginScreen = () => {
                                     }
                                 ]}
                             >
-                                <Text category="h1" style={styles.title}>
-                                    flippify
-                                </Text>
+                                <FlippifyLogo />
                             </Animated.View>
 
                             <View style={styles.spacer} />
@@ -233,12 +231,6 @@ const styles = StyleSheet.create({
         zIndex: 1,
         paddingTop: 20,
         paddingBottom: 100,
-    },
-    title: {
-        fontFamily: "Lato_900Black_Italic",
-        fontSize: 48,
-        fontStyle: "italic",
-        color: "black",
     },
     subtitle: {
         fontSize: 18,

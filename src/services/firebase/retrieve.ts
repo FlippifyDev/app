@@ -9,11 +9,11 @@ import { extractItemDateByFilter, extractItemId } from "./extract";
 import { DateFilterKeyType, HardcodedStoreType, ItemType, RootColType, SubColType } from "./models";
 
 
-export async function retrieveUser({ uid }: { uid: string }): Promise<IUser | void> {
+export async function retrieveUser({ uid, refresh }: { uid: string, refresh?: boolean }): Promise<IUser | void> {
     try {
         // Step 1: Try to get cached user from AsyncStorage
         const cachedUser = await AsyncStorage.getItem(CACHE_PREFIX + uid);
-        if (cachedUser) {
+        if (cachedUser && !refresh) {
             return JSON.parse(cachedUser) as IUser;
         }
 
@@ -82,25 +82,6 @@ export async function retrieveConnectedAccounts({ uid }: { uid: string }): Promi
     }
 }
 
-
-export async function retrieveUserStoreTypes({
-    uid,
-    rootCol
-}: {
-    uid: string;
-    rootCol: string;
-}): Promise<string[]> {
-    try {
-        const metaRef = doc(firestore, rootCol, uid, '_meta', 'storeTypes');
-        const snap = await getDoc(metaRef);
-        if (!snap.exists()) return [];
-        const data = snap.data();
-        return Array.isArray(data.types) ? data.types : [];
-    } catch (error) {
-        console.error("Error retrieveUserStoreTypes:", error);
-        return [];
-    }
-  }
 
 interface RetrieveItemsFromDBProps {
     uid: string;

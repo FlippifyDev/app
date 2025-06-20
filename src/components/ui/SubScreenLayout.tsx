@@ -1,7 +1,7 @@
 import { Colors } from "@/src/theme/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 
 export const SubScreenLayout = ({ children }: { children: React.ReactNode }) => {
@@ -28,7 +28,7 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingTop: 10,
-        paddingHorizontal: 16,
+        paddingHorizontal: 12,
         paddingBottom: 6,
         height: "100%",
     },

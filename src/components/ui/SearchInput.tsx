@@ -47,7 +47,6 @@ const SearchInput: React.FC<Props> = ({ containerStyle, style, ...props }) => {
 const styles = StyleSheet.create({
     container: {
         marginVertical: 8,
-        paddingHorizontal: 20
     },
     input: {
         borderRadius: 9999,

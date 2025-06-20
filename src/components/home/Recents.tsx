@@ -14,7 +14,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import Card from '../ui/Card';
 import NoResultsFound from '../ui/NoResultsFound';
@@ -90,7 +90,14 @@ export default function Recents() {
     }
 
     if (recents.length === 0) {
-        return <NoResultsFound />;
+        return (
+            <ScrollView
+                style={{ flex: 1 }}
+                contentContainerStyle={{ justifyContent: "center", paddingHorizontal: 10, height: "100%" }}
+            >
+                <NoResultsFound />
+            </ScrollView>
+        );
     }
 
     return (
@@ -126,8 +133,8 @@ export default function Recents() {
                                     styles.pill,
                                     {
                                         backgroundColor: listing?.itemId
-                                            ? 'rgba(40, 167, 69, 0.7)' 
-                                            : 'rgba(0, 122, 255, 0.7)', 
+                                            ? 'rgba(40, 167, 69, 0.7)'
+                                            : 'rgba(0, 122, 255, 0.7)',
                                         borderColor: listing?.itemId
                                             ? 'rgba(40, 167, 69, 0.7)'
                                             : 'rgba(0, 122, 255, 0.7)',

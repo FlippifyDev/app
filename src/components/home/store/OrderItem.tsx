@@ -65,6 +65,12 @@ const OrderItem: React.FC<ItemProps> = ({ item, includeExtra }) => {
                                 {profit.toFixed(2) ?? "N/A"}
                             </Text>
                         }
+                        {profit < 0 &&
+                            <Text style={styles.neutralPrice}>
+                                -{currencySymbol}
+                                {profit.toFixed(2).replace("-", "") ?? "N/A"}
+                            </Text>
+                        }
                     </View>
                 </View>
             </Card>

@@ -1,15 +1,15 @@
-import { useMarketStorage } from '@/src/hooks/useMarketStorage';
 import { useUser } from '@/src/hooks/useUser';
-import { IMarketItem } from '@/src/models/market-compare';
 import { IListing } from '@/src/models/store-data';
 import { createItem } from '@/src/services/api/create-item';
-import { inventoryCol } from '@/src/services/firebase/constants';
 import { retrieveIdToken } from '@/src/services/firebase/retrieve';
-import { updateItem } from '@/src/services/firebase/update';
+import { Colors } from '@/src/theme/colors';
+import { addCacheData, retrieveCacheItem, setCacheItem } from '@/src/utils/cache-helpers';
+import { inventoryCacheKey, subColsCacheKey } from '@/src/utils/contants';
 import { formatDateToISO } from '@/src/utils/format';
 import { generateRandomFlippifyListingId } from '@/src/utils/generate-random';
+import { validatePriceInput } from '@/src/utils/input-validation';
 import CurrencyList from 'currency-list';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
     Image,
     Keyboard,
@@ -27,38 +27,32 @@ import FButton from '../../ui/FButton';
 import ImageUpload from '../../ui/ImageUpload';
 import Input from '../../ui/Input';
 import SuccessModal from '../../ui/SuccessModal';
-import { Colors } from '@/src/theme/colors';
+import { inventoryCol } from '@/src/services/firebase/constants';
+import { updateItem } from '@/src/services/firebase/update';
 
-interface Props {
-    marketItem: IMarketItem;
-    cacheKey: string;
-}
 
-const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
+
+const Editor = () => {
     const user = useUser();
-    const listing = marketItem.listing as IListing;
-    const [localListing, setLocalListing] = useState<IListing>({ ...listing });
-    const currencySymbol = CurrencyList.get(listing.currency ?? 'USD')?.symbol_native;
+    const cacheKey = `${inventoryCacheKey}-${user?.id}`
+    const [listing, setListing] = useState<IListing>({});
+    const currencySymbol = CurrencyList.get(user?.preferences?.currency ?? 'USD')?.symbol_native;
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
     const [failed, setFailed] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
 
+    const [listingPrice, setListingPrice] = useState<string | null>(null);
+    const [purchasePrice, setPurchasePrice] = useState<string | null>(null);
+
     // Image Upload
     const [fileName, setFileName] = useState("Upload Image");
     const [url, setUrl] = useState("");
     const [showImageUploadModal, setShowImageUploadModal] = useState(false);
-    const { updateItem: updateCache } = useMarketStorage()
-
-    useEffect(() => {
-        setLocalListing({ ...listing });
-    }, [listing]);
-
-
 
     const updateField = <K extends keyof IListing>(field: K, value: IListing[K]) => {
-        const updated = { ...localListing, [field]: value };
-        setLocalListing(updated);
+        const updated = { ...listing, [field]: value };
+        setListing(updated);
     };
 
     async function handleAddItem() {
@@ -76,7 +70,7 @@ const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
             return;
         }
 
-        if (!localListing.storeType || !localListing.name) {
+        if (!listing.storeType || !listing.name) {
             setMessage("Please fill out all the required fields");
             setLoading(false);
             setShowSuccessModal(true);
@@ -84,21 +78,30 @@ const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
             return;
         }
 
+        if (!listing.dateListed) {
+            listing.dateListed = formatDateToISO(new Date());
+        }
+
+        if (!listing.purchase) {
+            listing.purchase = {};
+            listing.purchase.date = formatDateToISO(new Date());
+        }
+
         const item: IListing = {
-            ...localListing,
-            storeType: localListing.storeType?.toLowerCase(),
+            ...listing,
+            storeType: listing.storeType?.toLowerCase(),
             createdAt: formatDateToISO(new Date()),
             condition: "Brand New",
-            initialQuantity: localListing.quantity,
+            initialQuantity: listing.quantity,
             itemId: listing.itemId ? listing.itemId : generateRandomFlippifyListingId(),
             lastModified: formatDateToISO(new Date()),
             recordType: "manual",
-            image: url ? [url] : localListing.image
+            image: url ? [url] : listing.image,
         }
 
         let error;
         let message;
-        if (listing.itemId && item.storeType) {
+        if (listing.itemId && item.storeType && item.dateListed) {
             await updateItem({ uid: user?.id as string, item, rootCol: inventoryCol, subCol: item.storeType });
             message = "Listing edited successfully!"
         } else {
@@ -110,8 +113,13 @@ const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
             setMessage(error);
             setFailed(true);
         } else {
-            marketItem.listing = item;
-            await updateCache(cacheKey, marketItem);
+            const storeCache = await retrieveCacheItem(`${subColsCacheKey}-${user?.id}`) as string[];
+            if (!storeCache) {
+                await setCacheItem(`${subColsCacheKey}-${user?.id}`, [item.storeType])
+            } else if (!storeCache.includes(item.storeType as string)) {
+                await setCacheItem(`${subColsCacheKey}-${user?.id}`, [...storeCache, item.storeType])
+            }
+            await addCacheData(cacheKey, { [item.itemId as string]: item });
             setShowSuccessModal(true);
             setMessage(message);
         }
@@ -125,7 +133,7 @@ const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             keyboardVerticalOffset={0}
         >
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <ScrollView
                     style={{ flex: 1 }}
                     showsVerticalScrollIndicator={false}
@@ -139,10 +147,10 @@ const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
                         {url && (
                             <Image source={{ uri: url }} style={styles.image} />
                         )}
-                        {(!url && localListing.image?.[0]) && (
-                            <Image source={{ uri: localListing.image[0] }} style={styles.image} />
+                        {(!url && listing.image?.[0]) && (
+                            <Image source={{ uri: listing.image[0] }} style={styles.image} />
                         )}
-                        {(!url && !localListing.image?.[0]) && (
+                        {(!url && !listing.image?.[0]) && (
 
                             <View style={[styles.image, styles.placeholder]}>
                                 <Text style={styles.placeholderText}>No Image</Text>
@@ -153,40 +161,42 @@ const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
                     {/* Inputs */}
                     <Input
                         label="Name*"
-                        value={localListing.name ?? ''}
-                        onChangeText={(text) => updateField('name', text.trim())}
+                        value={listing.name ?? ''}
+                        onChangeText={(text) => updateField('name', text)}
                         placeholder="Item name"
                     />
 
                     <Input
                         label="Listing Platform*"
-                        value={localListing.storeType ?? ''}
-                        onChangeText={(text) => updateField('storeType', text.toLowerCase().trim())}
+                        value={listing.storeType ?? ''}
+                        onChangeText={(text) => updateField('storeType', text.toLowerCase())}
                         placeholder="Listing Platform*"
                         autoCapitalize="none"
                         autoCorrect={false}
-                        readOnly={!(!localListing.storeType)}
-                        style={!(!localListing.storeType) ? { backgroundColor: Colors.muted } : undefined}
+                        readOnly={!(!listing.itemId)}
+                        style={!(!listing.itemId) ? { backgroundColor: Colors.muted } : undefined}
                     />
 
                     <Input
                         label="Listing Price*"
-                        value={localListing.price?.toString() ?? ''}
-                        onChangeText={(text) => updateField('price', parseFloat(text) || 0)}
+                        value={listingPrice?.toString()}
+                        onChangeText={(text) => validatePriceInput(text, setListingPrice)}
+                        onBlur={() => updateField('price', listingPrice ? parseFloat(listingPrice) : null)}
                         placeholder="Listing Price*"
-                        keyboardType="numeric"
+                        keyboardType="decimal-pad"
                         adornment={currencySymbol}
                         adornmentPosition="left"
                     />
                     <Input
                         label="Purchase Price"
-                        value={localListing.purchase?.price?.toString() ?? ''}
-                        onChangeText={(text) =>
-                            setLocalListing(prev => ({
+                        value={purchasePrice?.toString() ?? ''}
+                        onChangeText={(text) => validatePriceInput(text, setPurchasePrice)}
+                        onBlur={() =>
+                            setListing(prev => ({
                                 ...prev,
                                 purchase: {
                                     ...prev.purchase,
-                                    price: parseFloat(text) || 0,
+                                    price: purchasePrice ? parseFloat(purchasePrice) : null,
                                 },
                             }))
                         }
@@ -197,23 +207,23 @@ const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
                     />
                     <Input
                         label="Quantity"
-                        value={localListing.quantity?.toString() ?? ''}
+                        value={listing.quantity?.toString() ?? ''}
                         onChangeText={(text) => updateField('quantity', parseInt(text) || 0)}
                         keyboardType="numeric"
-                        placeholder="1"
+                        placeholder="Quantity"
                     />
 
                     <DatePicker
                         label="Listing Date"
-                        value={new Date(localListing.dateListed ?? new Date()) ?? new Date()}
+                        value={new Date(listing.dateListed ?? new Date()) ?? new Date()}
                         onChange={(date) => updateField('dateListed', date.toISOString())}
                     />
 
                     <DatePicker
                         label="Purchase Date"
-                        value={new Date(localListing.purchase?.date ?? new Date()) ?? new Date()}
+                        value={new Date(listing.purchase?.date ?? new Date()) ?? new Date()}
                         onChange={(date) =>
-                            setLocalListing(prev => ({
+                            setListing(prev => ({
                                 ...prev,
                                 purchase: {
                                     ...prev.purchase,
@@ -225,14 +235,14 @@ const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
 
                     <Input
                         label="SKU"
-                        value={localListing.sku ?? ''}
+                        value={listing.sku ?? ''}
                         onChangeText={(text) => updateField('sku', text.trim())}
                         placeholder="SKU"
                     />
 
                     <Input
                         label="Storage Location"
-                        value={localListing.storageLocation ?? ''}
+                        value={listing.storageLocation ?? ''}
                         onChangeText={(text) => updateField('storageLocation', text)}
                         placeholder="Storage Location"
                     />
@@ -267,7 +277,7 @@ const ListingEditor: React.FC<Props> = ({ marketItem, cacheKey }) => {
     );
 };
 
-export default ListingEditor;
+export default Editor;
 
 const styles = StyleSheet.create({
     container: {

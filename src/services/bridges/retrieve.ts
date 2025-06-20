@@ -3,13 +3,14 @@
 // Local Imports
 import { IOneTimeExpense, ISubscriptionExpense } from "@/src/models/expenses";
 import { IListing, IOrder } from "@/src/models/store-data";
-import { getCachedData, setCachedData } from "@/src/utils/cache-helpers";
-import { inventoryCacheKey, oneTimeExpensesCacheKey, orderCacheKey, subscriptionsExpensesCacheKey } from "@/src/utils/contants";
+import { getCachedData, retrieveCacheItem, setCachedData, setCacheItem } from "@/src/utils/cache-helpers";
+import { inventoryCacheKey, oneTimeExpensesCacheKey, orderCacheKey, subColsCacheKey, subscriptionsExpensesCacheKey } from "@/src/utils/contants";
 import { filterItemsByDate } from "@/src/utils/filters";
+import { retrieveStoreTypes } from "../api/retrieve-storetypes";
 import { expensesCol, expensesFilterKey, inventoryCol, inventoryFilterKey, oneTimeCol, ordersCol, ordersFilterKey, subscriptionsExpenseCol } from "../firebase/constants";
 import { extractItemDateByFilter, extractItemId } from "../firebase/extract";
 import { DateFilterKeyType, ItemType, RootColType, STORES, SubColFilter, SubColType } from "../firebase/models";
-import { retrieveConnectedAccounts, retrieveUserStoreTypes } from "../firebase/retrieve";
+import { retrieveConnectedAccounts, retrieveIdToken } from "../firebase/retrieve";
 import { updateCachedItems } from "../firebase/update";
 
 
@@ -137,6 +138,7 @@ export async function retrieveItems({ uid, rootCol, cacheKey, filterKey, timeFro
 
         // Step 4: Merge existing cached data
         const cache = await getCachedData(cacheKey) as { data: Record<string, ItemType> } | undefined;
+ 
         if (cache?.data) {
             Object.assign(mergedData, cache.data);
         }
@@ -193,6 +195,10 @@ export async function retrieveItems({ uid, rootCol, cacheKey, filterKey, timeFro
 
 export async function retrieveSubCols({ uid, subColFilter, subCol }: { uid: string, subColFilter: SubColFilter, subCol?: string }): Promise<{ cols: SubColType[], error?: string }> {
     const subCols: SubColType[] = [];
+    const cacheKey = `${subColsCacheKey}-${uid}`;
+
+    const cache = await retrieveCacheItem(cacheKey);
+    if (cache) return { cols: cache as SubColType[] };
 
     if (subCol) {
         return { cols: [subCol] }
@@ -206,8 +212,10 @@ export async function retrieveSubCols({ uid, subColFilter, subCol }: { uid: stri
             subCols.push(subscriptionsExpenseCol);
 
         } else if (subColFilter === inventoryCol || subColFilter === ordersCol) {
+            const idToken = await retrieveIdToken();
+            if (!idToken) throw Error("No/Invalid id token found");
             // Step 2: Retrieve all store types
-            const storeTypes = await retrieveUserStoreTypes({ uid, rootCol: subColFilter });
+            const { storeTypes } = await retrieveStoreTypes({ idToken, subColFilter });
             if (storeTypes === undefined) throw Error("Error fetching store types");
 
             // Step 3: Retrieve connected accounts
@@ -228,6 +236,7 @@ export async function retrieveSubCols({ uid, subColFilter, subCol }: { uid: stri
             }
         }
 
+        await setCacheItem(cacheKey, subCols)
         return { cols: subCols };
     } catch (error) {
         console.log(`Error in retrieveSubCols: ${error}`);
@@ -235,9 +244,10 @@ export async function retrieveSubCols({ uid, subColFilter, subCol }: { uid: stri
     }
 }
 
-export async function retrieveOrderStoreTypes({ uid }: { uid: string }): Promise<string[] | void> {
+export async function retrieveOrderStoreTypes({ idToken }: { idToken: string }): Promise<string[] | void> {
     try {
-        return await retrieveUserStoreTypes({ uid, rootCol: ordersCol });
+        const { storeTypes } = await retrieveStoreTypes({ idToken, subColFilter: ordersCol });
+        return storeTypes
     } catch (error) {
         console.log(`Error in retrieveOrderStoreTypes: ${error}`);
     }

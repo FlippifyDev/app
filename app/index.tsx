@@ -6,7 +6,7 @@ import { Text } from '@ui-kitten/components';
 import { Stack, useRouter } from 'expo-router';
 import { onAuthStateChanged } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import LoginScreen from './login';
 
 const Index = () => {
@@ -48,7 +48,6 @@ const Index = () => {
                             flippify
                         </Text>
                     )}
-                    <ActivityIndicator size="small" />
                     <Landing />
                 </View>
             </>
