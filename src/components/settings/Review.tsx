@@ -44,7 +44,6 @@ const Review: React.FC = () => {
 
 const styles = StyleSheet.create({
     container: {
-        marginTop: 10,
         alignItems: 'center',
         justifyContent: 'center',
     },

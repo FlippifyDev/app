@@ -120,11 +120,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
             return;
         }
 
-        if (imageUrl.includes("imgur")) {
+        if (imageUrl.includes("imgur.com/a")) {
             const imageId = imageUrl.replace("https://imgur.com/a/", "");
             imageUrl = `https://i.imgur.com/${imageId}.jpeg`
         }
-        console.log(imageUrl)
         handleUpload?.(imageUrl);
         setLoading(false);
         setIsModalOpen(false);

@@ -18,8 +18,6 @@ export default function ConnectedAccountsScreen() {
             ? Object.entries(user.connectedAccounts).filter(([_, value]) => value != null)
             : [];
 
-        console.log(connectedAccounts)
-
         setAccounts(connectedAccounts);
     }, [user]);
 

@@ -3,9 +3,10 @@ import { Colors } from '@/src/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { signOut } from 'firebase/auth';
 import React from 'react';
-import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Review from './Review';
 
 export default function LogoutButton() {
@@ -23,7 +24,7 @@ export default function LogoutButton() {
 
     const openTerms = async () => {
         try {
-            await Linking.openURL('https://flippify.io/l/terms-and-conditions');
+            await WebBrowser.openBrowserAsync('https://flippify.io/l/terms-and-conditions');
         } catch (error) {
             console.error('Failed to open Terms and Conditions:', error);
         }
@@ -31,7 +32,16 @@ export default function LogoutButton() {
 
     const openPrivacy = async () => {
         try {
-            await Linking.openURL('https://flippify.io/l/privacy-policy');
+            await WebBrowser.openBrowserAsync('https://flippify.io/l/privacy-policy');
+        } catch (error) {
+            console.error('Failed to open Privacy Policy:', error);
+        }
+    };
+
+
+    const openWebsiteProfile = async () => {
+        try {
+            await WebBrowser.openBrowserAsync(`https://flippify.io/l/login`);
         } catch (error) {
             console.error('Failed to open Privacy Policy:', error);
         }
@@ -46,7 +56,13 @@ export default function LogoutButton() {
             <View style={styles.versionContainer}>
                 <Text style={styles.versionText}>Version {appVersion}</Text>
             </View>
-            <Review />
+            <View style={styles.linksContainer}>
+                <Review />
+                <Text style={styles.separator}> | </Text>
+                <TouchableOpacity onPress={openWebsiteProfile}>
+                    <Text style={styles.linkText}>Delete Account</Text>
+                </TouchableOpacity>
+            </View>
             <View style={styles.linksContainer}>
                 <TouchableOpacity onPress={openTerms}>
                     <Text style={styles.linkText}>Terms and Conditions</Text>
@@ -64,6 +80,7 @@ const styles = StyleSheet.create({
     container: {
         alignItems: 'center',
         marginTop: 16,
+        marginBottom: 10
     },
     logoutContainer: {
         flexDirection: 'row',

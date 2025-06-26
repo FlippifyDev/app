@@ -1,9 +1,12 @@
+import WaveSvg from "@/src/components/login/WaveSVG";
+import FlippifyLogo from "@/src/components/ui/FlippifyLogo";
 import { auth } from "@/src/config/firebase";
 import { Colors } from "@/src/theme/colors";
 import { Lato_900Black_Italic, useFonts } from "@expo-google-fonts/lato";
 import { Button, Input, Text } from "@ui-kitten/components";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import * as WebBrowser from 'expo-web-browser';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { Eye, EyeOff } from "lucide-react-native";
 import React, { useRef, useState } from "react";
@@ -12,16 +15,12 @@ import {
     Animated,
     Keyboard,
     KeyboardAvoidingView,
-    Linking,
     Platform,
     ScrollView,
     StyleSheet,
     TouchableWithoutFeedback,
-    View,
+    View
 } from "react-native";
-
-import WaveSvg from "@/src/components/login/WaveSVG";
-import FlippifyLogo from "@/src/components/ui/FlippifyLogo";
 
 const LoginScreen = () => {
     const router = useRouter();
@@ -77,7 +76,7 @@ const LoginScreen = () => {
             />
         ) : (
             <EyeOff
-                    color={Colors.textPlaceholder}
+                color={Colors.textPlaceholder}
                 size={24}
                 onPress={() => setPasswordVisible(true)}
             />
@@ -87,6 +86,13 @@ const LoginScreen = () => {
         inputRange: [0, 1],
         outputRange: [0, -120],
     });
+
+    const openSignUp = async () => {
+        await WebBrowser.openBrowserAsync('https://flippify.io/l/sign-up');
+    };
+    const openReset = async () => {
+        await WebBrowser.openBrowserAsync('https://flippify.io/l/reset-password');
+    };
 
     return (
         <View style={styles.screenContainer}>
@@ -164,9 +170,7 @@ const LoginScreen = () => {
                                 <View style={{ alignItems: "center", marginBottom: 16 }}>
                                     <Text
                                         style={styles.link}
-                                        onPress={() =>
-                                            Linking.openURL("https://flippify.io/l/reset-password")
-                                        }
+                                        onPress={openReset}
                                     >
                                         Forgot your password?
                                     </Text>
@@ -180,9 +184,7 @@ const LoginScreen = () => {
                                     </Text>
                                     <Text
                                         style={styles.link}
-                                        onPress={() =>
-                                            Linking.openURL("https://flippify.io/l/sign-up")
-                                        }
+                                        onPress={openSignUp}
                                     >
                                         Sign up
                                     </Text>
@@ -215,6 +217,7 @@ const styles = StyleSheet.create({
         backgroundColor: "transparent",
         padding: 32,
         justifyContent: "flex-start",
+        alignItems: "center"
     },
     header: {
         alignItems: "center",
@@ -231,6 +234,8 @@ const styles = StyleSheet.create({
         zIndex: 1,
         paddingTop: 20,
         paddingBottom: 100,
+        maxWidth: 400,
+        minWidth: 320
     },
     subtitle: {
         fontSize: 18,
@@ -269,20 +274,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         borderWidth: 0,
         borderColor: "transparent",
-    },
-    bottomLeftSvg: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        transform: [{ scaleX: 1 }],
-    },
-    bottomRightSvg: {
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        marginBottom: 25,
-        marginRight: 20,
-        transform: [{ scaleX: -1 }],
     },
 });
 

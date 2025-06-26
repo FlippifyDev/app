@@ -6,6 +6,7 @@ import { useGlobalSearchParams } from 'expo-router';
 
 // External Imports
 import React, { useEffect, useState } from 'react';
+import { ActivityIndicator } from 'react-native';
 
 
 export default function HomeScreen() {
@@ -25,8 +26,10 @@ export default function HomeScreen() {
         }
     }, [login]);
 
-    if (!user?.authentication?.subscribed || user?.authentication?.subscribed === "free") {
+    if (user && !user?.authentication?.subscribed || user?.authentication?.subscribed === "free") {
         return <NoAccess />;
+    } else if (!user) {
+        return <ActivityIndicator size="small" />
     }
 
     return (
