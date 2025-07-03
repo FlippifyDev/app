@@ -11,6 +11,8 @@ const SettingsLayout = () => {
             <Stack.Screen name="index" />
             <Stack.Screen name="connected-accounts" />
             <Stack.Screen name="subscription" />
+            <Stack.Screen name="plans" />
+            <Stack.Screen name="socials" />
         </Stack>
     );
 };

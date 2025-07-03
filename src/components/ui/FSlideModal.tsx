@@ -2,14 +2,14 @@ import { Colors } from '@/src/theme/colors';
 import React, { useEffect, useRef } from 'react';
 import { Animated, Easing, Keyboard, Modal, ModalProps, PanResponder, StyleSheet, TouchableWithoutFeedback, View, ViewStyle } from 'react-native';
 
-interface FModalProps extends ModalProps {
+interface FSlideModalProps extends ModalProps {
     visible: boolean;
     onClose: () => void;
     children: React.ReactNode;
     containerStyle?: ViewStyle;
 }
 
-const FModal: React.FC<FModalProps> = ({
+const FSlideModal: React.FC<FSlideModalProps> = ({
     visible,
     onClose,
     children,
@@ -156,7 +156,7 @@ const FModal: React.FC<FModalProps> = ({
     );
 };
 
-export default FModal;
+export default FSlideModal;
 
 const styles = StyleSheet.create({
     container: {

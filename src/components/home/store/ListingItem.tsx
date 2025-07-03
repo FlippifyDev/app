@@ -1,12 +1,14 @@
 import { IListing } from '@/src/models/store-data';
 import { Colors } from '@/src/theme/colors';
 import { formatDate, shortenText } from '@/src/utils/format';
-import { Text } from '@ui-kitten/components';
+import { Avatar, Text } from '@ui-kitten/components';
 import CurrencyList from 'currency-list';
 import React, { useState } from 'react';
-import { Image, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, StyleSheet, View } from 'react-native';
 import Card from '../../ui/Card';
-import FModal from '../../ui/FModal';
+import FItemModal from '../../ui/FItemModal';
+import { Section } from './Section';
+import Price from '../../ui/Price';
 
 interface ItemProps {
     item: IListing;
@@ -35,66 +37,80 @@ const ListingItem: React.FC<ItemProps> = ({ item, includeExtra }) => {
                         </Text>
                     </View>
                     <View style={styles.priceContainer}>
-                        <Text style={styles.price}>
-                            {currencySymbol}
-                            {item.price?.toFixed(2) ?? "N/A"}
-                        </Text>
+                        {typeof item.price === "number" ? (
+                            <Price price={item.price ?? 0} currencySymbol={currencySymbol} baseSize={20} style={styles.price} />
+                        ): (
+                            <Text style={styles.price}>
+                                N/A
+                            </Text>
+                        )}
                     </View>
                 </View>
             </Card>
 
-            {showModal && (
-                <FModal visible onClose={() => setShowModal(false)}>
-                    <ScrollView style={styles.modalContent}>
-                        {item.image?.[0] && <Image source={{ uri: item.image[0] }} style={styles.modalImage} />}
-                        <Text style={styles.modalTitle}>{item.name || 'Listing Details'}</Text>
+            <FItemModal
+                visible={showModal}
+                onClose={() => setShowModal(false)}
+            >
+                <View style={{ width: "100%", alignItems: "center" }}>
+                    {item.image?.[0] && (
+                        <Avatar source={{ uri: item.image[0] }} style={styles.modalImage} />
+                    )}
+                </View>
+                <Text style={styles.modalTitle}>{item.name || "Listing Details"}</Text>
 
-                        <Section label="Listing Info">
-                            <Row label="Item ID" value={item.itemId} />
-                            <Row label="Store" value={item.storeType} />
-                            <Row label="Date Listed" value={formatDate(item.dateListed)} />
-                            <Row label="Quantity" value={item.quantity} />
-                            <Row label="Initial Quantity" value={item.initialQuantity} />
-                            <Row label="Price" value={item.price != null ? `${currencySymbol}${item.price.toFixed(2)}` : 'N/A'} />
-                        </Section>
+                <Section
+                    rows={[
+                        { label: "Item ID", value: item.itemId },
+                        { label: "Store", value: item.storeType },
+                        { label: "Listed", value: formatDate(item.dateListed) },
+                        { label: "Quantity", value: item.quantity },
+                        { label: "Initial Quantity", value: item.initialQuantity },
+                        {
+                            label: "Price",
+                            value:
+                                item.price != null
+                                    ? `${currencySymbol}${item.price.toFixed(2)}`
+                                    : "N/A",
+                        },
+                    ]}
+                />
 
-                        <Section label="Item Details">
-                            <Row label="Condition" value={item.condition} />
-                            <Row label="SKU" value={item.sku} />
-                            <Row label="Custom Tag" value={item.customTag} />
-                            <Row label="Storage Location" value={item.storageLocation} />
-                            {item.extra && Object.entries(item.extra).map(([key, val]) => (
-                                <Row key={key} label={key} value={val} />
-                            ))}
-                        </Section>
+                <Section
+                    rows={[
+                        { label: "Condition", value: item.condition ?? "N/A" },
+                        { label: "SKU", value: item.sku ?? "N/A" },
+                        { label: "Custom Tag", value: item.customTag ?? "N/A" },
+                        { label: "Storage Location", value: item.storageLocation ?? "N/A" },
+                        ...(item.extra
+                            ? Object.entries(item.extra).map(([key, val]) => ({
+                                label: key,
+                                value: val,
+                            }))
+                            : []),
+                    ]}
+                />
 
-                        {item.purchase && (
-                            <Section label="Purchase Info">
-                                <Row label="Platform" value={item.purchase.platform} />
-                                <Row label="Date" value={formatDate(item.purchase.date)} />
-                                <Row label="Price" value={item.purchase.price != null ? `${currencySymbol}${item.purchase.price.toFixed(2)}` : 'N/A'} />
-                            </Section>
-                        )}
-                    </ScrollView>
-                </FModal>
-            )}
+                {item.purchase && (
+                    <Section
+                        rows={[
+                            { label: "Purchase Platform", value: item.purchase.platform },
+                            { label: "Purchase Date", value: formatDate(item.purchase.date) },
+                            {
+                                label: "Purchase Price",
+                                value:
+                                    item.purchase.price != null
+                                        ? `${currencySymbol}${item.purchase.price.toFixed(2)}`
+                                        : "N/A",
+                            },
+                        ]}
+                    />
+                )}
+            </FItemModal>
         </View>
     );
 };
 
-const Section: React.FC<{ label: string, children: React.ReactNode }> = ({ label, children }) => (
-    <View style={styles.section}>
-        <Text style={styles.sectionLabel}>{label}</Text>
-        {children}
-    </View>
-);
-
-const Row: React.FC<{ label: string; value?: string | number | null }> = ({ label, value }) => (
-    <View style={styles.row}>
-        <Text style={styles.rowLabel}>{label}</Text>
-        <Text style={styles.rowValue}>{value ?? 'N/A'}</Text>
-    </View>
-);
 
 const styles = StyleSheet.create({
     entry: {
@@ -136,28 +152,12 @@ const styles = StyleSheet.create({
     },
     subtitle: { marginTop: 4, fontSize: 14, color: Colors.textSubtitle },
     modalContent: { marginBottom: 20 },
-    modalTitle: { fontSize: 20, fontWeight: '700', marginBottom: 12, textAlign: 'center', color: Colors.text },
-    modalImage: { width: '100%', height: 200, resizeMode: 'contain', marginBottom: 16 },
-    section: { marginTop: 16 },
-    sectionLabel: {
-        fontSize: 16,
-        fontWeight: '600',
-        marginBottom: 8,
-        borderBottomWidth: 1,
-        borderBottomColor: '#ddd',
-        paddingBottom: 4,
-        color: Colors.text
+    modalTitle: { fontSize: 20, fontWeight: '700', marginBottom: 12, textAlign: 'center', color: Colors.background },
+    modalImage: {
+        marginBottom: 16,
+        width: 96,
+        height: 96,
     },
-    row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        paddingVertical: 6,
-    },
-    rowLabel: {
-        fontWeight: '500',
-        color: Colors.text
-    },
-    rowValue: { flex: 1, textAlign: 'right', color: Colors.text },
 });
 
 export default ListingItem;

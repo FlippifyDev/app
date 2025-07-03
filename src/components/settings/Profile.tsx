@@ -1,8 +1,10 @@
 import { IUser } from '@/src/models/user';
 import { Colors } from '@/src/theme/colors';
+import { formatUsername } from '@/src/utils/format';
 import { Avatar, Text } from '@ui-kitten/components';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
+import ProfileLetters from '../ui/ProfileLetters';
 
 interface Props {
     user?: IUser
@@ -35,7 +37,7 @@ export default function Profile({ user }: Props) {
                 />
             )}
             {!image && (
-                <View style={styles.avatar} />
+                <ProfileLetters text={formatUsername(username)} containerStyle={styles.avatar} textStyle={{fontSize: 20}}/>
             )}
         </View>
     );

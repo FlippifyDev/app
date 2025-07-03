@@ -81,7 +81,7 @@ const HomeLayout = () => {
         <Tabs
             tabBar={() => <CustomTabBar />}
             screenLayout={ScreenLayout}
-            screenOptions={{ headerShown: false }}
+            screenOptions={{ headerShown: false, lazy: true }}
         >
             <Tabs.Screen
                 name="index"

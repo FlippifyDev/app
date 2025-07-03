@@ -1,7 +1,9 @@
 import { useUser } from '@/src/hooks/useUser';
+import { IChartData } from '@/src/models/chart';
 import { IOrder } from '@/src/models/store-data';
 import { retrieveOrders } from '@/src/services/bridges/retrieve';
 import { Colors } from '@/src/theme/colors';
+import { calculateOrderProfit } from '@/src/utils/calculate';
 import { formatDateToISO } from '@/src/utils/format';
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, View } from 'react-native';
@@ -18,47 +20,58 @@ export type RootTabParamList = {
     Orders: undefined;
 };
 
-
-function aggregateOrdersByDate(items: IOrder[], timeRange: TimeRange) {
+function aggregateOrdersByDate(items: IOrder[], timeRange: TimeRange): IChartData[] {
     const map = new Map<string, number>();
+    const orderMap = new Map<string, IOrder>();
 
     // Populate totals for dates that have data
     items.forEach(item => {
         if (!item.sale?.date) return;
         const day = new Date(item.sale.date).toISOString().slice(0, 10);
         map.set(day, (map.get(day) || 0) + (item.sale.price || 0));
+        orderMap.set(day, item);
     });
 
-    // Build full list of date strings between timeFrom and timeTo
+    // Build full list of date strings between timeFrom and timeTo (+1 day)
     const labels: string[] = [];
     const dataPoints: number[] = [];
-    {
-        const d = new Date(timeRange.timeFrom);
-        const end = new Date(timeRange.timeTo);
-        while (d <= end) {
-            const day = d.toISOString().slice(0, 10);
-            labels.push(day);
-            dataPoints.push(map.get(day) ?? 0); // Use 0 if no data for the day
-            d.setDate(d.getDate() + 1);
-        }
+    const data: IOrder[] = [];
+
+    const d = new Date(timeRange.timeFrom);
+    const end = new Date(timeRange.timeTo);
+
+    while (d <= end) {
+        // Calculate the *display* day as one day ahead
+        const displayDate = new Date(d);
+        displayDate.setDate(displayDate.getDate() + 1);
+
+        const dayLabel = displayDate.toISOString().slice(0, 10);
+        labels.push(dayLabel);
+
+        // But you still map & pull data using the *original* day key:
+        const key = d.toISOString().slice(0, 10);
+        dataPoints.push(map.get(key) ?? 0);
+        data.push(orderMap.get(key) ?? ({} as IOrder));
+
+        // Move to next day
+        d.setDate(d.getDate() + 1);
     }
 
-    // Transform data into the format expected by react-native-gifted-charts
-    const chartData = labels.map((label, index) => ({
+    // Transform into chart format
+    return labels.map((label, index) => ({
         value: dataPoints[index],
-        label,
-
+        time: new Date(label).getTime(),
+        profit: calculateOrderProfit({ item: data[index] }),
     }));
-
-    return chartData;
 }
 
 const Home = () => {
     const user = useUser();
     const [items, setItems] = useState<IOrder[]>();
-    const [hoverInfo, setHoverInfo] = useState<{ value?: number, index?: number }>();
-
-    const [timeRange, setTimeRange] = useState({ timeFrom: new Date(), timeTo: new Date() });
+    const [hoverInfo, setHoverInfo] = useState<{ value?: number, profit?: number }>();
+    
+    const now = new Date();
+    const [timeRange, setTimeRange] = useState({ timeFrom: new Date(now.getFullYear(), now.getMonth(), 1), timeTo: new Date() });
     const [selectedRange, setSelectedRange] = useState<RangeKey>('TM');
 
     const chartData = React.useMemo(() => {
@@ -72,7 +85,6 @@ const Home = () => {
             const items = await retrieveOrders({ uid: user.id as string, timeFrom: formatDateToISO(timeRange.timeFrom), timeTo: formatDateToISO(timeRange.timeTo) })
             const activeItems = (items ?? []).filter(item => item.status !== 'Active');
             setItems(activeItems);
-
         }
 
         if ((user?.authentication?.subscribed)) {
@@ -92,8 +104,8 @@ const Home = () => {
                 from.setDate(now.getDate() - 7);
                 break;
             case 'TW':
-                const day = now.getDay(); // Sunday = 0, Monday = 1, ..., Saturday = 6
-                const diff = (day === 0 ? 6 : day - 1); // Number of days to subtract to get Monday
+                const day = now.getDay();
+                const diff = (day === 0 ? 6 : day - 1);
                 from.setDate(now.getDate() - diff);
                 break;
             case 'TM': // This Month
@@ -111,8 +123,8 @@ const Home = () => {
         setTimeRange({ timeFrom: from, timeTo: now });
     };
 
-    function handleHoverInfoChange(value?: number, index?: number) {
-        setHoverInfo({ value, index })
+    function setY(value?: number, profit?: number) {
+        setHoverInfo({ value, profit })
     }
 
     return (
@@ -124,7 +136,8 @@ const Home = () => {
                 <View style={styles.chartHeader}>
                     <ChartHeader orderItems={items ?? []} hoverInfo={hoverInfo} selectedRange={selectedRange} />
                 </View>
-                <Chart data={chartData} setHoverInfo={handleHoverInfoChange} />
+                <Chart chartData={chartData} setY={setY} />
+                {/*<Chart data={chartData} setHoverInfo={handleHoverInfoChange} />*/}
                 <TimeRangeSelector
                     selected={selectedRange}
                     onChange={handleRangeChange}
@@ -138,7 +151,9 @@ const Home = () => {
 export default Home;
 
 const styles = StyleSheet.create({
-    scrollContainer: { flexGrow: 1 },
+    scrollContainer: { 
+        flexGrow: 1 
+    },
     safeArea: {
         flex: 1,
     },
@@ -155,6 +170,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         alignItems: "center",
         paddingHorizontal: 20,
+        marginBottom: 30,
         width: "100%",
     },
     tabBar: {

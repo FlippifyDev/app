@@ -1,8 +1,8 @@
+import { Colors } from '@/src/theme/colors';
 import { Ionicons } from '@expo/vector-icons';
 import React from 'react';
 import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import FModal from './FModal';
-import { Colors } from '@/src/theme/colors';
+import FSlideModal from './FSlideModal';
 
 interface SuccessModalProps {
     visible: boolean;
@@ -30,7 +30,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
     const iconColor = isSuccess ? Colors.houseBlue : 'red';
 
     return (
-        <FModal visible={visible} onClose={onClose}>
+        <FSlideModal visible={visible} onClose={onClose}>
             <View style={styles.container}>
                 <Ionicons name={statusIcon} size={48} color={iconColor} style={styles.statusIcon} />
 
@@ -42,7 +42,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
                     </TouchableOpacity>
                 )}
             </View>
-        </FModal>
+        </FSlideModal>
     );
 };
 

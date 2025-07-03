@@ -48,3 +48,22 @@ export function shortenText(name: string, length: number = 20): string {
     // For longer names, use the full cutoff at both ends.
     return `${name.substring(0, length)}...${name.substring(name.length - length)}`;
 }
+
+
+export function formatUsername(username: string): string {
+    // Split the username into words by uppercase letters
+    const words = username.match(/[A-Z][a-z]*/g);
+
+    if (!words) {
+        // If no match (e.g., username is all lowercase), return first two letters
+        return username.slice(0, 2).toUpperCase();
+    }
+
+    if (words.length === 1) {
+        // Only one word - return first two letters
+        return words[0].slice(0, 2).toUpperCase();
+    }
+
+    // Multiple words - return first letter of first two words
+    return (words[0][0] + words[1][0]).toUpperCase();
+}

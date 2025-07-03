@@ -15,6 +15,7 @@ import {
     Animated,
     Keyboard,
     KeyboardAvoidingView,
+    Linking,
     Platform,
     ScrollView,
     StyleSheet,
@@ -88,8 +89,9 @@ const LoginScreen = () => {
     });
 
     const openSignUp = async () => {
-        await WebBrowser.openBrowserAsync('https://flippify.io/l/sign-up');
+        await Linking.openURL('https://flippify.io/l/sign-up')
     };
+    
     const openReset = async () => {
         await WebBrowser.openBrowserAsync('https://flippify.io/l/reset-password');
     };

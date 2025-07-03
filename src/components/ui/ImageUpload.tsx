@@ -11,7 +11,7 @@ import {
     View
 } from 'react-native';
 import FButton from './FButton';
-import FModal from './FModal';
+import FSlideModal from './FSlideModal';
 import Input from './Input';
 
 interface ImageUploadProps {
@@ -139,7 +139,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
     }
 
     return (
-        <FModal visible={visible} onClose={handleCloseModal} containerStyle={{ paddingHorizontal: 10, paddingBottom: 20 }}>
+        <FSlideModal visible={visible} onClose={handleCloseModal} containerStyle={{ paddingHorizontal: 10, paddingBottom: 20 }}>
             {/**
                      * 
                      
@@ -175,7 +175,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                 />
                 {error && <Text style={styles.error}>{error}</Text>}
             </View>
-        </FModal >
+        </FSlideModal >
     );
 };
 

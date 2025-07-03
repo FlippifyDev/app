@@ -23,9 +23,10 @@ interface RetrieveProps {
     searchText?: string;
     pagenate?: boolean;
     nextPage?: boolean;
+    update?: boolean;
 }
 
-export async function retrieveOrders({ uid, timeFrom, timeTo, subCol, searchFields, searchText, pagenate, nextPage }: RetrieveProps): Promise<IOrder[] | void> {
+export async function retrieveOrders({ uid, timeFrom, timeTo, subCol, searchFields, searchText, pagenate, nextPage, update }: RetrieveProps): Promise<IOrder[] | void> {
     return await retrieveItems({
         uid,
         rootCol: ordersCol,
@@ -38,11 +39,12 @@ export async function retrieveOrders({ uid, timeFrom, timeTo, subCol, searchFiel
         searchFields,
         searchText,
         pagenate,
-        nextPage
+        nextPage,
+        update
     }) as IOrder[];
 }
 
-export async function retrieveInventory({ uid, timeFrom, timeTo, subCol, searchFields, searchText, pagenate, nextPage }: RetrieveProps): Promise<IListing[] | void> {
+export async function retrieveInventory({ uid, timeFrom, timeTo, subCol, searchFields, searchText, pagenate, nextPage, update }: RetrieveProps): Promise<IListing[] | void> {
     return await retrieveItems({
         uid,
         rootCol: inventoryCol,
@@ -55,11 +57,12 @@ export async function retrieveInventory({ uid, timeFrom, timeTo, subCol, searchF
         searchFields,
         searchText,
         pagenate,
-        nextPage
+        nextPage,
+        update
     });
 }
 
-export async function retrieveOneTimeExpenses({ uid, timeFrom, timeTo, subCol, searchFields, searchText, pagenate, nextPage }: RetrieveProps): Promise<IOneTimeExpense[] | void> {
+export async function retrieveOneTimeExpenses({ uid, timeFrom, timeTo, subCol, searchFields, searchText, pagenate, nextPage, update }: RetrieveProps): Promise<IOneTimeExpense[] | void> {
     return await retrieveItems({
         uid,
         rootCol: expensesCol,
@@ -72,11 +75,12 @@ export async function retrieveOneTimeExpenses({ uid, timeFrom, timeTo, subCol, s
         searchFields,
         searchText,
         pagenate,
-        nextPage
+        nextPage,
+        update
     }) as IOneTimeExpense[];
 }
 
-export async function retrieveSubscriptionExpenses({ uid, timeFrom, timeTo, subCol, searchFields, searchText, pagenate, nextPage }: RetrieveProps): Promise<ISubscriptionExpense[] | void> {
+export async function retrieveSubscriptionExpenses({ uid, timeFrom, timeTo, subCol, searchFields, searchText, pagenate, nextPage, update }: RetrieveProps): Promise<ISubscriptionExpense[] | void> {
     return await retrieveItems(
         {
             uid,
@@ -90,7 +94,8 @@ export async function retrieveSubscriptionExpenses({ uid, timeFrom, timeTo, subC
             searchFields,
             searchText,
             pagenate,
-            nextPage
+            nextPage,
+            update
         }) as ISubscriptionExpense[];
 }
 
@@ -107,8 +112,9 @@ interface RetrieveItemsProps {
     searchText?: string;
     pagenate?: boolean;
     nextPage?: boolean;
+    update?: boolean;
 }
-export async function retrieveItems({ uid, rootCol, cacheKey, filterKey, timeFrom, timeTo, subColFilter, subCol, searchFields, searchText, pagenate, nextPage }: RetrieveItemsProps): Promise<ItemType[] | void> {
+export async function retrieveItems({ uid, rootCol, cacheKey, filterKey, timeFrom, timeTo, subColFilter, subCol, searchFields, searchText, pagenate, nextPage, update }: RetrieveItemsProps): Promise<ItemType[] | void> {
     try {
         // Step 1: Retrieve sub collections
         const { cols: subCols, error } = await retrieveSubCols({ uid, subColFilter, subCol });
@@ -129,6 +135,7 @@ export async function retrieveItems({ uid, rootCol, cacheKey, filterKey, timeFro
                     searchText,
                     pagenate,
                     nextPage,
+                    update
                 })
             )
         );

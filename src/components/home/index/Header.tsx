@@ -1,10 +1,12 @@
 import { useUser } from '@/src/hooks/useUser';
 import { Colors } from '@/src/theme/colors';
+import { formatUsername } from '@/src/utils/format';
 import { Avatar } from '@ui-kitten/components';
 import { useRouter } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import FlippifyLogo from '../../ui/FlippifyLogo';
+import ProfileLetters from '../../ui/ProfileLetters';
 
 const Header = () => {
     const user = useUser();
@@ -35,7 +37,9 @@ const Header = () => {
                 </TouchableOpacity>
             )}
             {!image && (
-                <View style={styles.avatar} />
+                <TouchableOpacity onPress={handleOnAvatarClick}>
+                    <ProfileLetters text={formatUsername(user?.username ?? "NA")} containerStyle={styles.avatar} textStyle={{ fontSize: 12 }} />
+                </TouchableOpacity>
             )}
         </View>
     )

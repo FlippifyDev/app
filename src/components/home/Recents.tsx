@@ -14,7 +14,7 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
+import { ScrollView } from 'react-native-gesture-handler';
 import { SwipeListView } from 'react-native-swipe-list-view';
 import Card from '../ui/Card';
 import NoResultsFound from '../ui/NoResultsFound';
@@ -101,7 +101,7 @@ export default function Recents() {
     }
 
     return (
-        <GestureHandlerRootView style={styles.container}>
+        <View style={styles.container}>
             <SwipeListView
                 data={recents}
                 keyExtractor={item => item.query}
@@ -158,7 +158,7 @@ export default function Recents() {
                     </View>
                 )}
             />
-        </GestureHandlerRootView>
+        </View>
     );
 }
 

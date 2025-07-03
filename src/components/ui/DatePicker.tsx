@@ -3,7 +3,7 @@ import { formatDate } from '@/src/utils/format';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import FModal from './FModal';
+import FModal from './FSlideModal';
 
 interface Props {
     label?: string;

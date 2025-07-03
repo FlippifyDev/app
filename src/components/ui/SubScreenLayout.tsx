@@ -1,8 +1,9 @@
 import { Colors } from "@/src/theme/colors";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
+
 
 export const SubScreenLayout = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
@@ -12,25 +13,35 @@ export const SubScreenLayout = ({ children }: { children: React.ReactNode }) => 
     };
 
     return (
-        <ScrollView contentContainerStyle={styles.scrollContent} style={styles.container}>
+        <View style={styles.container}>
             <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
                 <Ionicons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
-            {children}
-        </ScrollView>
+            <ScrollView
+                style={styles.scrollWrapper}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
+                {children}
+            </ScrollView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: Colors.background,
-    },
-    scrollContent: {
         paddingTop: 10,
         paddingHorizontal: 12,
         paddingBottom: 6,
-        height: "100%",
+        backgroundColor: Colors.background
+    },
+    scrollContent: {
+        flex: 1,
+        paddingBottom: 32
+    },
+    scrollWrapper: {
+        flex: 1,
     },
     backButton: {
         flexDirection: 'row',

@@ -8,8 +8,9 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import Price from '../../ui/Price';
 import { useRouter } from 'expo-router';
+import { calculateOrderProfit } from '@/src/utils/calculate';
 
-const ChartHeader = ({ orderItems, hoverInfo, selectedRange }: { orderItems: IOrder[], hoverInfo?: { value?: number, index?: number }; selectedRange: string; }) => {
+const ChartHeader = ({ orderItems, hoverInfo, selectedRange }: { orderItems: IOrder[], hoverInfo?: { value?: number, profit?: number }; selectedRange: string; }) => {
     const user = useUser();
     const router = useRouter();
     const [currencySymbol, setCurrencySymbol] = useState<string>("$");
@@ -17,37 +18,32 @@ const ChartHeader = ({ orderItems, hoverInfo, selectedRange }: { orderItems: IOr
     const [total, setTotal] = useState<number>();
     const [profitText, setProfitText] = useState<string>();
 
-    useEffect(() => {
-        function handleRangeChange() {
-            switch (selectedRange) {
-                case '1D':
-                    setProfitText("LAST 24H");
-                    break;
-                case '1W':
-                    setProfitText("LAST WEEK");
-                    break;
-                case 'TW':
-                    setProfitText("THIS WEEK");
-                    break;
-                case 'TM': // This Month
-                    setProfitText("THIS MONTH");
-                    break;
-                case '1M':
-                    setProfitText("LAST MONTH");
-                    break;
-                case '3M':
-                    setProfitText("LAST 3 MONTHS");
-                    break;
-            }
-        };
-        handleRangeChange()
-    }, [selectedRange])
+    const getRangeText = (range: string) => {
+        switch (range) {
+            case '1D':
+                return "LAST 24H";
+            case '1W':
+                return "LAST WEEK";
+            case 'TW':
+                return "THIS WEEK";
+            case 'TM':
+                return "THIS MONTH";
+            case '1M':
+                return "LAST MONTH";
+            case '3M':
+                return "LAST 3 MONTHS";
+            default:
+                return "LAST 24H";
+        }
+    };
+
 
 
     useEffect(() => {
         if (hoverInfo && hoverInfo.value !== undefined) {
             setTotal(hoverInfo?.value);
-            setProfit(0);
+            setProfit(hoverInfo?.profit);
+            setProfitText("Profit");
             return;
         }
         setProfit(undefined);
@@ -62,14 +58,15 @@ const ChartHeader = ({ orderItems, hoverInfo, selectedRange }: { orderItems: IOr
         // Realized profit = sale price minus cost for each order
         newProfit = orderItems.reduce(
             (sum, item) =>
-                sum +
-                ((item.sale?.price || 0) - (item.purchase?.price || 0) - (item.tax?.amount || 0) - (item.additionalFees || 0) - (item.shipping?.sellerFees || 0)),
+                sum + calculateOrderProfit({ item }),
             0
         );
 
 
         setTotal(newTotal);
         setProfit(newProfit);
+
+        setProfitText(getRangeText(selectedRange));
 
         // Set currency symbol from user preferences
         if (user) {
@@ -102,7 +99,7 @@ const ChartHeader = ({ orderItems, hoverInfo, selectedRange }: { orderItems: IOr
             <View style={styles.profitContainer}>
                 <Text style={styles.profitText}>{profitText}</Text>
                 <Text style={styles.summary}>
-                    <Price price={profit ?? 0} currencySymbol={currencySymbol} baseSize={18} showSymbol style={{ color: ((profit ?? 0) > 0 ? Colors.houseBlue : Colors.red), fontWeight: "bold" }} />
+                    <Price price={profit ?? 0} currencySymbol={currencySymbol} baseSize={18} showSymbol style={{ color: ((profit ?? 0) > 0 ? Colors.houseBlue : profit === 0 ? Colors.text : Colors.red), fontWeight: "bold" }} />
                 </Text>
             </View>
             <View>

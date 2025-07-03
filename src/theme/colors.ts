@@ -14,5 +14,8 @@ export const Colors = {
     iconGreen: '#1a73e8',
     successGreen: '#4BB543',
     muted: "#F0F0F0",
-    red: "#ff0000"
+    red: "#ff0000",
+    inputField: '#1e1e1e',
+    gray: '#666',
+    lightGray: '#727272',
 };

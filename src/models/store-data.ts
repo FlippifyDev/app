@@ -12,7 +12,7 @@ export type OrderStatus =
 
 export type Condition = "new" | "used" | "opened" | "unopened" | "refurbished" | string;
 export type SubscriptionName = "Free - member" | "Standard - member" | "Pro - member" | "Enterprise 1 - member" | "Enterprise 2 - member" | "Enterprise 3 - member" | "Enterprise 4 - member";
-
+export type SubscriptionType = "free" | "standard" | "pro" | "enterprise 1" | "enterprise 2" | "enterprise 3" | "enterprise 4"
 
 export const STORES = ["ebay", "stockx"];
 export type HardcodedStoreType = typeof STORES[number];

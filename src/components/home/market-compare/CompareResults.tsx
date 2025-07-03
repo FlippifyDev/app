@@ -54,7 +54,7 @@ const CompareResults = ({
 
 
     return (
-        <View style={{ flex: 1, backgroundColor: Colors.background }}>
+        <View style={{ flex: 1 }}>
             {loading ? (
                 <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                     <ActivityIndicator size="small" />
@@ -89,7 +89,6 @@ const CompareResults = ({
 
                     {/* Bottom Tab Bar */}
                     <View style={styles.tabBar}>
-
                         <TouchableOpacity style={styles.addButton} onPress={handleAddListing}>
                             <Ionicons name="add-outline" size={26} color="white" />
                         </TouchableOpacity>

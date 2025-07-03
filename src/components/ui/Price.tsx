@@ -17,11 +17,11 @@ const Price: React.FC<Props> = ({ price, currencySymbol, baseSize, style, showSy
     return (
         <View style={styles.container}>
             <Text style={[styles.priceText, style]} accessibilityRole="text">
-                <Text style={{ fontSize: baseSize * 0.7, lineHeight: baseSize }}>{showSymbol ? (price >= 0 ? "+" : "-") : ""}</Text>
+                <Text style={{ fontSize: baseSize * 0.7, lineHeight: baseSize }}>{showSymbol ? (price > 0 ? "+" : price === 0 ? "" : "-") : ""}</Text>
                 {currencySymbol && (
                     <Text style={{ fontSize: baseSize * 0.7, lineHeight: baseSize }}>{currencySymbol}</Text>
                 )}
-                <Text style={{ fontSize: baseSize, lineHeight: baseSize }}>{intPart}</Text>
+                <Text style={{ fontSize: baseSize, lineHeight: baseSize }}>{showSymbol ? intPart.replace("-", "") : intPart}</Text>
                 <Text style={{ fontSize: baseSize * 0.7, lineHeight: baseSize }}>.{decPart}</Text>
             </Text>
         </View>

@@ -8,8 +8,10 @@ import { signOut } from 'firebase/auth';
 import React from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Review from './Review';
+import { useUser } from '@/src/hooks/useUser';
 
 export default function LogoutButton() {
+    const user = useUser();
     const router = useRouter();
     const appVersion = Constants.expoConfig?.version ?? 'Unknown';
 
@@ -41,7 +43,7 @@ export default function LogoutButton() {
 
     const openWebsiteProfile = async () => {
         try {
-            await WebBrowser.openBrowserAsync(`https://flippify.io/l/login`);
+            await WebBrowser.openBrowserAsync(`https://flippify.io/u/${user?.username}/profile`);
         } catch (error) {
             console.error('Failed to open Privacy Policy:', error);
         }

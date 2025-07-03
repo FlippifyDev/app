@@ -4,8 +4,9 @@ import { retrieveInventory } from '@/src/services/bridges/retrieve';
 import { Colors } from '@/src/theme/colors';
 import { extractUserListingsCount } from '@/src/utils/extract';
 import { formatDateToISO } from '@/src/utils/format';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
+import { RefreshControl } from 'react-native-gesture-handler';
 import NoResultsFound from '../../ui/NoResultsFound';
 import { TimeRange } from '../../ui/TimeFilter';
 import ListingItem from './ListingItem';
@@ -16,7 +17,9 @@ const Inventory = ({ searchText, setRootItems, timeFilter }: { searchText?: stri
     const [items, setItems] = useState<IListing[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
+    const [update, setUpdate] = useState(false);
     const [triggerUpdate, setTriggerUpdate] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
 
     // Page Config
     const itemsPerPage = 24;
@@ -39,18 +42,31 @@ const Inventory = ({ searchText, setRootItems, timeFilter }: { searchText?: stri
             setLoading(true);
             if (!user) return;
 
-            const items = await retrieveInventory({ uid: user.id as string, timeFrom: formatDateToISO(timeFilter.timeFrom), timeTo: formatDateToISO(timeFilter.timeTo), searchText, searchFields: ["customTag", "itemId", "storeType", "name", "purchase.platform", "storageLocation", "sku"], pagenate: true, nextPage })
+            const items = await retrieveInventory({
+                uid: user.id as string,
+                timeFrom: formatDateToISO(timeFilter.timeFrom),
+                timeTo: formatDateToISO(timeFilter.timeTo),
+                searchText,
+                searchFields: ["customTag", "itemId", "storeType", "name", "purchase.platform", "storageLocation", "sku"],
+                pagenate: true,
+                nextPage,
+                update
+            })
             setItems(items ?? []);
             setRootItems?.(items ?? [])
 
             setLoading(false);
 
+            setNextPage(false);
+            setTriggerUpdate(false);
+            setUpdate(false);
+            setRefreshing(false);
         }
 
         if ((user?.authentication?.subscribed && triggerUpdate) || nextPage) {
             fetchItems();
         }
-    }, [user, nextPage, searchText, triggerUpdate, setRootItems, timeFilter]);
+    }, [user, nextPage, searchText, triggerUpdate, setRootItems, timeFilter, update]);
 
     function handleEndReached() {
         if (currentPage >= totalPages) return;
@@ -59,37 +75,42 @@ const Inventory = ({ searchText, setRootItems, timeFilter }: { searchText?: stri
         setCurrentPage(currentPage + 1)
     }
 
-    if (loading) {
-        return (
-            <View style={styles.center}>
-                <ActivityIndicator size="small" />
-            </View>
-        );
-    }
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        setUpdate(true);
+        setTriggerUpdate(true);
+        setCurrentPage(1);
+    }, []);
 
 
     return (
         <View style={styles.container}>
-            {paginatedData.length > 0 && (
-                <FlatList
-                    data={paginatedData}
-                    style={{ paddingHorizontal: 4 }}
-                    keyExtractor={item => item.itemId as string}
-                    renderItem={({ item }) => (
-                        <ListingItem item={item} />
-                    )}
-                    onEndReached={handleEndReached}
-                    onEndReachedThreshold={0.5}
-                    ListFooterComponent={() => loading ? <ActivityIndicator style={{ margin: 16 }} /> : null}
-                    showsVerticalScrollIndicator={false}
-                    showsHorizontalScrollIndicator={false}
-                />
-            )}
-            {paginatedData.length <= 0 && (
-                <View style={styles.noResultContainer}>
-                    <NoResultsFound />
-                </View>
-            )}
+            <FlatList
+                data={paginatedData}
+                style={{ paddingHorizontal: 4 }}
+                keyExtractor={item => item.itemId as string}
+                renderItem={({ item }) => (
+                    <ListingItem item={item} />
+                )}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+                onEndReached={handleEndReached}
+                onEndReachedThreshold={0.5}
+                ListFooterComponent={() => loading ? <ActivityIndicator style={{ margin: 16 }} /> : null}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        tintColor={Colors.gray}
+                        size={10}
+                    />
+                }
+                ListEmptyComponent={() => (
+                    <View style={styles.noResultContainer}>
+                        <NoResultsFound />
+                    </View>
+                )}
+            />
         </View>
     )
 }
@@ -105,7 +126,8 @@ const styles = StyleSheet.create({
     },
     noResultContainer: {
         flex: 1,
-        justifyContent: "center"
+        justifyContent: "center",
+        height: 400
     },
     center: {
         flex: 1,
