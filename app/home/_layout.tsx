@@ -10,7 +10,8 @@ const CustomTabBar = (props: any) => {
     const router = useRouter();
     const user = useUser();
 
-    const hasNoAccess = !user?.authentication?.subscribed || user?.authentication?.subscribed === "free";
+    const hasNoAccess = !user?.authentication?.subscribed;
+    
     const isActive = (route: string) => {
         if (route === '/home/index') {
             // Match /home/index exactly or any sub-route (e.g., /home/index/Inventory)

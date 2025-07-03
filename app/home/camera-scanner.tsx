@@ -4,6 +4,7 @@ import { BarcodeScanningResult, CameraType, CameraView, useCameraPermissions } f
 import { useFocusEffect, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from 'react';
 import { ActivityIndicator, Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import Svg, { Defs, Mask, Rect } from "react-native-svg";
 
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
@@ -14,7 +15,7 @@ const RECT_HEIGHT = 200;
 
 // Compute its on-screen bounds
 const RECT_LEFT = (SCREEN_W - RECT_WIDTH) / 2;
-const RECT_TOP = (SCREEN_H - RECT_HEIGHT) / 2;
+const RECT_TOP = (SCREEN_H - RECT_HEIGHT) / 3;
 const RECT_RIGHT = RECT_LEFT + RECT_WIDTH;
 const RECT_BOTTOM = RECT_TOP + RECT_HEIGHT;
 
@@ -114,37 +115,64 @@ export default function CameraScannerScreen() {
                         <Ionicons name="camera-reverse-outline" size={28} color="white" />
                     </TouchableOpacity>
                 </View>
-                <View style={styles.overlay}>
-                    <View style={styles.topOverlay} />
 
-                    <View style={styles.middleRow}>
-                        <View style={styles.sideOverlay} />
-                        <View style={styles.cutout} />
-                        <View style={styles.sideOverlay} />
-                    </View>
-
-                    <View style={styles.bottomOverlay} />
-                </View>
+                <OverlayWithRoundedHole />
             </CameraView >
         </View>
     );
 }
 
+const OverlayWithRoundedHole = () => (
+    <Svg
+        width={SCREEN_W}
+        height={SCREEN_H}
+        style={StyleSheet.absoluteFill}
+    >
+        <Defs>
+            <Mask id="cutout-mask">
+                {/* Full‐screen opaque base */}
+                <Rect x="0" y="0" width={SCREEN_W} height={SCREEN_H} fill="white" />
+                {/* Transparent hole: the white here “cuts out” */}
+                <Rect
+                    x={RECT_LEFT}
+                    y={RECT_TOP}
+                    width={RECT_WIDTH}
+                    height={RECT_HEIGHT}
+                    rx={16}      // same as your borderRadius
+                    ry={16}
+                    fill="black"
+                />
+            </Mask>
+        </Defs>
+
+        {/* Semitransparent fill, but masked by our “cutout-mask” */}
+        <Rect
+            x="0"
+            y="0"
+            width={SCREEN_W}
+            height={SCREEN_H}
+            fill="rgba(0,0,0,0.6)"
+            mask="url(#cutout-mask)"
+        />
+        {/* You can still render your white border on top */}
+        <Rect
+            x={RECT_LEFT}
+            y={RECT_TOP}
+            width={RECT_WIDTH}
+            height={RECT_HEIGHT}
+            rx={16}
+            ry={16}
+            fill="none"
+            stroke="white"
+            strokeWidth={2}
+        />
+    </Svg>
+);
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-    },
-    startButton: {
-        paddingHorizontal: 20,
-        paddingVertical: 12,
-        backgroundColor: 'royalblue',
-        borderRadius: 8,
-    },
-    startText: {
-        color: 'white',
-        fontSize: 18,
-        fontWeight: 'bold',
     },
     message: {
         color: Colors.text,
@@ -164,64 +192,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
     },
-    controlText: {
-        color: 'white',
-        fontSize: 16,
-        marginLeft: 6,
-    },
     camera: {
         flex: 1,
-    },
-    buttonContainer: {
-        flex: 1,
-        flexDirection: 'row',
-        backgroundColor: 'transparent',
-        margin: 64,
-    },
-    button: {
-        flex: 1,
-        alignSelf: 'flex-end',
-        alignItems: 'center',
-    },
-    text: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: 'white',
-    },
-    overlay: {
-        ...StyleSheet.absoluteFillObject,
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 10,
-    },
-
-    topOverlay: {
-        flex: 1,
-        width: '100%',
-        backgroundColor: 'rgba(0,0,0,0.6)',
-    },
-
-    middleRow: {
-        flexDirection: 'row',
-        height: RECT_HEIGHT,
-    },
-
-    sideOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.6)',
-    },
-
-    cutout: {
-        width: RECT_WIDTH,
-        height: RECT_HEIGHT,
-        borderWidth: 1,
-        borderColor: 'white',
-        backgroundColor: 'transparent',
-    },
-
-    bottomOverlay: {
-        flex: 1,
-        width: '100%',
-        backgroundColor: 'rgba(0,0,0,0.6)',
     },
 });

@@ -101,6 +101,7 @@ const CompareResults = ({
 
 const styles = StyleSheet.create({
     tabBar: {
+        display: "none",
         position: 'absolute',
         bottom: 0,
         left: 0,

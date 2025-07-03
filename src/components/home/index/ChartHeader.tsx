@@ -126,7 +126,8 @@ const styles = StyleSheet.create({
         backgroundColor: Colors.houseBlue,
         borderRadius: 9999,
         padding: 8,
-        marginTop: 10
+        marginTop: 10,
+        display: "none",
     },
     title: {
         color: Colors.text,
