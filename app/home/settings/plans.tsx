@@ -14,7 +14,7 @@ export default function PlansScreen() {
                 <Card title="Free" description="For beginners" type="free" price={0} />
                 <Card title="Standard" description="For growing resellers" type="standard" price={9.99} />
                 <Card title="Pro" description="For experts" type="pro" price={19.99} />
-                <Card title="Enterprise" description="For large scale operations" type="enterprise 1" price={29.99} />
+                <Card title="Enterprise" description="For large scale operations" type="enterprise 1" price={49.99} />
             </View>
         </SubScreenLayout>
     );

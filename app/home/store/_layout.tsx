@@ -9,8 +9,6 @@ const StoreLayout = () => {
             }}
         >
             <Stack.Screen name="index" />
-            <Stack.Screen name="inventory-item" />
-            <Stack.Screen name="order-item" />
         </Stack>
     );
 };
