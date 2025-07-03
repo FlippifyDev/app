@@ -77,13 +77,6 @@
           "cameraPermission": "Allow Flippify to take photos to upload item images.",
           "microphonePermission": "Allow Flippify to record audio while taking photos/videos."
         }
-      ],
-      [
-        "@stripe/stripe-react-native",
-        {
-          "merchantIdentifier": "merchant.com.flippify",
-          "publishableKey": "pk_test_51PQYKLJJRepiHZ8dSMnPexqW730215yleF4LrhJjPfmKjKDjZZ04qnOiJvkR0C1uJGXCECyYiQl2I2TSHOwNwNdk000maiuHlY"
-        }
       ]
     ],
     "experiments": {
