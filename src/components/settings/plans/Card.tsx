@@ -3,10 +3,10 @@ import { Colors } from '@/src/theme/colors';
 import { Text } from '@ui-kitten/components';
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import Purchases from 'react-native-purchases';
+//import Purchases from 'react-native-purchases';
 
-const apiKey = process.env.PUBLIC_API_KEY_REVENUE_CAT ?? "";
-Purchases.configure({ apiKey });
+//const apiKey = process.env.PUBLIC_API_KEY_REVENUE_CAT ?? "";
+//Purchases.configure({ apiKey });
 
 interface Props {
     title: string;
